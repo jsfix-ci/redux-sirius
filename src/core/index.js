@@ -45,7 +45,7 @@ class Sirius {
       reducerObj[model.namespace] = handleActions(handlers, model.state)
       if (model.effects) {
         for (const key of Object.keys(model.effects)) {
-          const sagaKey = addPrefix(key)
+          const sagaKey = addPrefix(model.namespace)(key)
           // FIXME: Only support takeEvery now
           sagas.push(function * e () {
             yield sagaEffects.fork(function * t () {

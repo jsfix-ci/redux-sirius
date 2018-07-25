@@ -109,45 +109,42 @@ test('Model with customized reducers', () => {
   })
 })
 
-// 不知道为什么jest跑带有generator的表达式就卡住
-// test('Model with sagas', (done) => {
-//   const s = new Sirius()
-//   s.model({
-//     ...model0,
-//     namespace: 'test',
-//     effects: {
-//       * replaceSecondLover ({ payload }) {
-//         const { put, select, call } = effects
-//         yield put({
-//           type: 'test/setName',
-//           payload: 'bad man'
-//         })
-//         yield call(delay, 200)
-//         const lovers = yield select(state => state.test.lovers)
-//         lovers[1] = payload
-//         yield call(delay, 500)
-//         yield put({
-//           type: 'test/setLovers',
-//           payload: lovers
-//         })
-//       }
-//     }
-//   })
-//   const store = s.store()
-//   store.dispatch({
-//     type: 'test/replaceSecondLover',
-//     payload: {
-//       name: 'bad man',
-//       sex: 10
-//     }
-//   })
-//   const state = store.getState()
-//   setTimeout(() => {
-//     expect(state.test.name).toBe('bad man')
-//     expect(state.test.lovers[1]).toEqual({
-//       name: 'bad man',
-//       sex: 10
-//     })
-//     done()
-//   }, 700)
-// })
+test('Model with sagas', async () => {
+  const s = new Sirius()
+  s.model({
+    ...model0,
+    namespace: 'test',
+    effects: {
+      * replaceSecondLover ({ payload }) {
+        const { put, select, call } = effects
+        yield put({
+          type: 'test/setName',
+          payload: 'bad man'
+        })
+        yield call(delay, 200)
+        const lovers = yield select(state => state.test.lovers)
+        lovers[1] = payload
+        yield call(delay, 500)
+        yield put({
+          type: 'test/setLovers',
+          payload: lovers
+        })
+      }
+    }
+  })
+  const store = s.store()
+  store.dispatch({
+    type: 'test/replaceSecondLover',
+    payload: {
+      name: 'bad man',
+      sex: 10
+    }
+  })
+  await delay(700)
+  const state = store.getState()
+  expect(state.test.name).toBe('bad man')
+  expect(state.test.lovers[1]).toEqual({
+    name: 'bad man',
+    sex: 10
+  })
+})
