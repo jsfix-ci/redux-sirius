@@ -1,0 +1,13 @@
+{
+  "presets": [
+    "env"
+  ],
+  "plugins": [
+    [
+      "transform-regenerator",
+      "transform-runtime", {
+        "regenerator": true
+      }
+    ]
+  ]
+}
