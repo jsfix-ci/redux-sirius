@@ -19,6 +19,15 @@ const model0 = {
     ]
   }
 }
+test('Should only exist one redux store', () => {
+  const s = new Sirius()
+  s.store()
+  try {
+    s.store()
+  } catch (e) {
+    expect(e.message).toBe('Only support one store')
+  }
+})
 test('new Sirius with empty models', () => {
   const s = new Sirius()
   expect(s._models.length).toBe(0)

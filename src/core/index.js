@@ -7,11 +7,18 @@ import * as sagaEffects from 'redux-saga/effects'
 import { addPrefix, addSetPrefix } from './utils/prefix'
 import { mergeConfig } from './utils/mergeConfig'
 
+// One store guarantee
+
 class Sirius {
   constructor (config) {
     this.config = mergeConfig(config)
     this._models = []
   }
+
+  addModel (model) {
+    checkModel(model)
+  }
+
   model (m) {
     checkModel(m)
     this._models.push(m)
@@ -25,6 +32,7 @@ class Sirius {
   }
 
   store () {
+    invariant(!this._store, 'Only support one store')
     const models = this._models
     const reducerObj = {}
     const sagas = []
@@ -36,22 +44,18 @@ class Sirius {
         handlers[addSetPrefix(model.namespace)(key)] = (state, action) => ({ ...state, [key]: action.payload })
       }
       // add user defined reducers
-      if (model.reducers) {
-        for (const r of Object.keys(model.reducers)) {
-          handlers[addPrefix(model.namespace)(r)] = model.reducers[r]
-        }
+      for (const r of Object.keys(model.reducers || {})) {
+        handlers[addPrefix(model.namespace)(r)] = model.reducers[r]
       }
       reducerObj[model.namespace] = handleActions(handlers, model.state)
-      if (model.effects) {
-        for (const key of Object.keys(model.effects)) {
-          const sagaKey = addPrefix(model.namespace)(key)
-          // TODO: Only support takeEvery now
-          sagas.push(function * e () {
-            yield sagaEffects.fork(function * t () {
-              yield sagaEffects.takeEvery(sagaKey, model.effects[key])
-            })
+      for (const key of Object.keys(model.effects || {})) {
+        const sagaKey = addPrefix(model.namespace)(key)
+        // TODO: Only support takeEvery now
+        sagas.push(function * e () {
+          yield sagaEffects.fork(function * t () {
+            yield sagaEffects.takeEvery(sagaKey, model.effects[key])
           })
-        }
+        })
       }
     }
     let store
@@ -73,6 +77,8 @@ class Sirius {
       store = createStore(combineReducers(reducerObj), mws)
     }
     sagas.forEach(sagaMiddleware.run)
+    this._store = store
+    this.runSaga = sagaMiddleware.run
     return store
   }
 }
