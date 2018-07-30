@@ -29,7 +29,7 @@ test('Model without namespace', () => {
   try {
     app.model(model0)
   } catch (e) {
-    expect(e.message).toBe('`namespace` must be set for a model')
+    expect(e.message).toBe('model\'s `namespace` [string] is required')
   }
 })
 

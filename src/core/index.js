@@ -4,15 +4,13 @@ import { handleActions } from 'redux-actions'
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import * as sagaEffects from 'redux-saga/effects'
-
-const dash = '/'
+import { addPrefix, addSetPrefix } from './utils/prefix'
 
 class Sirius {
-  constructor (options) {
-    this.options = options || {}
+  constructor (config) {
+    this.config = config || {}
     this._models = []
   }
-
   model (m) {
     checkModel(m)
     this._models.push(m)
@@ -46,7 +44,7 @@ class Sirius {
       if (model.effects) {
         for (const key of Object.keys(model.effects)) {
           const sagaKey = addPrefix(model.namespace)(key)
-          // FIXME: Only support takeEvery now
+          // TODO: Only support takeEvery now
           sagas.push(function * e () {
             yield sagaEffects.fork(function * t () {
               yield sagaEffects.takeEvery(sagaKey, model.effects[key])
@@ -57,7 +55,7 @@ class Sirius {
     }
     let store
     const sagaMiddleware = createSagaMiddleware()
-    const { middlewares } = this.options
+    const { middlewares } = this.config
     let mws
     if (!Array.isArray(middlewares)) {
       mws = applyMiddleware(sagaMiddleware)
@@ -65,7 +63,7 @@ class Sirius {
       // TODO: custom middleware order support
       mws = applyMiddleware(...middlewares, sagaMiddleware)
     }
-    if (__DEV__) {
+    if (__DEV__ && this.config.devTools) {
       store = createStore(combineReducers(reducerObj),
         // redux devtools support
         window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
@@ -78,29 +76,11 @@ class Sirius {
   }
 }
 function checkModel (model) {
-  invariant(model.namespace, '`namespace` must be set for a model')
-  invariant(typeof model.namespace === 'string', '`namespace` must be a string')
+  invariant(model.namespace && typeof model.namespace === 'string', 'model\'s `namespace` [string] is required')
   invariant(model.namespace.trim().length !== 0, `Invalid \`namespace\` : [${model.namespace}]`)
-  invariant(model.state, 'A model must have `state` field')
+  invariant(model.state, 'model\'s `state` is required')
   // TODO: check duplicate namespace
   return model
-}
-
-function addSetPrefix (namespace) {
-  return name => (namespace ? `${namespace}${dash}set${upperCaseFirst(name)}`
-    : `set${upperCaseFirst(name)}`)
-}
-
-function addPrefix (namespace) {
-  return namespace ? name => `${namespace}${dash}${name}` : name => name
-}
-
-function upperCaseFirst (s) {
-  if (s.length > 1) {
-    return s[0].toUpperCase() + s.substring(1, s.length)
-  } else {
-    return s.toUpperCase()
-  }
 }
 
 exports.effects = sagaEffects
