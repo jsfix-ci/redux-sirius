@@ -4,11 +4,28 @@
   "description": "A framework to integrate redux and redux-saga together",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "clean": "rimraf lib dist es coverage",
+    "lint": "eslint src",
+    "test": "jest",
+    "test:cov": "jest --coverage",
+    "prepare": "npm run clean && npm run lint && npm test && npm run build",
+    "build": "npm run build:commonjs && npm run build:es && npm run build:umd && npm run build:umd:min",
+    "build:commonjs": "cross-env NODE_ENV=cjs rollup -c -o lib/sirius.js",
+    "build:es": "cross-env BABEL_ENV=es NODE_ENV=es rollup -c -o es/sirius.js",
+    "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development rollup -c -o dist/sirius.js",
+    "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production rollup -c -o dist/sirius.min.js"
   },
+  "files": [
+    "dist",
+    "lib",
+    "es",
+    "src"
+  ],
   "keywords": [
     "redux",
     "redux-saga",
+    "store",
+    "flux",
     "framework"
   ],
   "author": "fullstop000",
@@ -27,6 +44,7 @@
     "babel-plugin-transform-regenerator": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.7.0",
+    "cross-env": "^5.2.0",
     "eslint": "^5.2.0",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.13.0",
@@ -34,6 +52,13 @@
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-standard": "^3.1.0",
     "jest": "^23.4.1",
-    "regenerator-runtime": "^0.12.0"
+    "regenerator-runtime": "^0.12.0",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.63.4",
+    "rollup-plugin-commonjs": "^9.1.4",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-uglify": "^4.0.0",
+    "uglify-es": "^3.3.9"
   }
 }
