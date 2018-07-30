@@ -1,6 +1,5 @@
 /* eslint-disable no-underscore-dangle,no-undef */
 import invariant from 'invariant'
-import { handleActions } from 'redux-actions'
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import * as sagaEffects from 'redux-saga/effects'
@@ -17,39 +16,36 @@ class Sirius {
 
   addModel (model) {
     checkModel(model)
-  }
-
-  model (m) {
-    checkModel(m)
-    this._models.push(m)
-  }
-
-  models (...models) {
-    // TODO: directly read model from path
-    for (const m of models) {
-      this.model(m)
-    }
+    // add reducers
   }
 
   store () {
     invariant(!this._store, 'Only support one store')
-    const models = this._models
+    const config = this.config
     const reducerObj = {}
     const sagas = []
-    for (const model of models) {
-      // TODO: use file name as namespace
+    for (const name of Object.keys(config.models)) {
+      const model = config.models[name]
+      checkModel(model)
       const handlers = {}
       // generate default reducers by state
       for (const key of Object.keys(model.state)) {
-        handlers[addSetPrefix(model.namespace)(key)] = (state, action) => ({ ...state, [key]: action.payload })
+        handlers[addSetPrefix(name)(key)] = (state, action) => ({ ...state, [key]: action.payload })
       }
       // add user defined reducers
       for (const r of Object.keys(model.reducers || {})) {
-        handlers[addPrefix(model.namespace)(r)] = model.reducers[r]
+        const reducer = model.reducers[r]
+        let finalReducer
+        if (typeof reducer === 'function') {
+          finalReducer = (state, action) => reducer(state, action)
+        } else {
+          finalReducer = (state) => state
+        }
+        handlers[addPrefix(name)(r)] = finalReducer
       }
-      reducerObj[model.namespace] = handleActions(handlers, model.state)
+      reducerObj[name] = (state = model.state, action) => (handlers[action.type] ? handlers[action.type](state, action) : state)
       for (const key of Object.keys(model.effects || {})) {
-        const sagaKey = addPrefix(model.namespace)(key)
+        const sagaKey = addPrefix(name)(key)
         // TODO: Only support takeEvery now
         sagas.push(function * e () {
           yield sagaEffects.fork(function * t () {
@@ -57,6 +53,10 @@ class Sirius {
           })
         })
       }
+      this._models.push({
+        namespace: name,
+        ...model
+      })
     }
     let store
     const sagaMiddleware = createSagaMiddleware()
@@ -68,13 +68,14 @@ class Sirius {
       // TODO: custom middleware order support
       mws = applyMiddleware(...middlewares, sagaMiddleware)
     }
-    if (__DEV__ && this.config.devTools) {
-      store = createStore(combineReducers(reducerObj),
+    const rootReducer = mergeReducers(reducerObj)
+    if (__DEV__ && this.config.devtools.enable) {
+      store = createStore(rootReducer,
         // redux devtools support
-        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(this.config.devtools.options),
         mws)
     } else {
-      store = createStore(combineReducers(reducerObj), mws)
+      store = createStore(rootReducer, mws)
     }
     sagas.forEach(sagaMiddleware.run)
     this._store = store
@@ -82,11 +83,15 @@ class Sirius {
     return store
   }
 }
+function mergeReducers (reducers, newReducers) {
+  const finalyReduers = { ...reducers, ...newReducers }
+  if (!Object.keys(finalyReduers).length) {
+    return state => state
+  }
+  return combineReducers(finalyReduers)
+}
 function checkModel (model) {
-  invariant(model.namespace && typeof model.namespace === 'string', 'model\'s `namespace` [string] is required')
-  invariant(model.namespace.trim().length !== 0, `Invalid \`namespace\` : [${model.namespace}]`)
   invariant(model.state, 'model\'s `state` is required')
-  // TODO: check duplicate namespace
   return model
 }
 

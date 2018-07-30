@@ -1,12 +1,12 @@
-const dash = '/'
+const slash = '/'
 
 export function addSetPrefix (namespace) {
-  return name => (namespace ? `${namespace}${dash}set${upperCaseFirst(name)}`
+  return name => (namespace ? `${namespace}${slash}set${upperCaseFirst(name)}`
     : `set${upperCaseFirst(name)}`)
 }
 
 export function addPrefix (namespace) {
-  return namespace ? name => `${namespace}${dash}${name}` : name => name
+  return namespace ? name => `${namespace}${slash}${name}` : name => name
 }
 
 function upperCaseFirst (s) {

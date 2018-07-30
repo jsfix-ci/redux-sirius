@@ -28,24 +28,18 @@ test('Should only exist one redux store', () => {
     expect(e.message).toBe('Only support one store')
   }
 })
-test('new Sirius with empty models', () => {
+test('Sirius with empty models', () => {
   const s = new Sirius()
+  s.store()
   expect(s._models.length).toBe(0)
 })
 
-test('Model without namespace', () => {
-  const app = new Sirius()
-  try {
-    app.model(model0)
-  } catch (e) {
-    expect(e.message).toBe('model\'s `namespace` [string] is required')
-  }
-})
-
 test('Model without reducers', () => {
-  const app = new Sirius()
-  app.model({ ...model0, namespace: 'test' })
-  const store = app.store()
+  const store = new Sirius({
+    models: {
+      test: model0
+    }
+  }).store()
   const state = store.getState()
   expect(state.test).toEqual({
     name: 'fuck',
@@ -64,9 +58,11 @@ test('Model without reducers', () => {
 })
 
 test('Model default reducers', () => {
-  const app = new Sirius()
-  app.model({ ...model0, namespace: 'test' })
-  const store = app.store()
+  const store = new Sirius({
+    models: {
+      test: model0
+    }
+  }).store()
   store.dispatch({
     type: 'test/setName',
     payload: '~~~'
@@ -76,29 +72,30 @@ test('Model default reducers', () => {
 })
 
 test('Model with customized reducers', () => {
-  const app = new Sirius()
-  app.model({
-    ...model0,
-    namespace: 'test',
-    reducers: {
-      setName: (state, { payload }) => {
-        if (payload === 'test') {
-          return { ...state, name: 'hello world' }
-        } else {
-          return { ...state, name: payload }
-        }
-      },
-      setFirstLover: (state, { payload }) => {
-        const { lovers } = state
-        lovers[0] = payload
-        return {
-          ...state,
-          lovers
+  const store = new Sirius({
+    models: {
+      test: {
+        ...model0,
+        reducers: {
+          setName: (state, { payload }) => {
+            if (payload === 'test') {
+              return { ...state, name: 'hello world' }
+            } else {
+              return { ...state, name: payload }
+            }
+          },
+          setFirstLover: (state, { payload }) => {
+            const { lovers } = state
+            lovers[0] = payload
+            return {
+              ...state,
+              lovers
+            }
+          }
         }
       }
     }
-  })
-  const store = app.store()
+  }).store()
   store.dispatch({
     type: 'test/setName',
     payload: 'test'
@@ -119,29 +116,30 @@ test('Model with customized reducers', () => {
 })
 
 test('Model with sagas', async () => {
-  const s = new Sirius()
-  s.model({
-    ...model0,
-    namespace: 'test',
-    effects: {
-      * replaceSecondLover ({ payload }) {
-        const { put, select, call } = effects
-        yield put({
-          type: 'test/setName',
-          payload: 'bad man'
-        })
-        yield call(delay, 200)
-        const lovers = yield select(state => state.test.lovers)
-        lovers[1] = payload
-        yield call(delay, 500)
-        yield put({
-          type: 'test/setLovers',
-          payload: lovers
-        })
+  const store = new Sirius({
+    models: {
+      test: {
+        ...model0,
+        effects: {
+          * replaceSecondLover ({ payload }) {
+            const { put, select, call } = effects
+            yield put({
+              type: 'test/setName',
+              payload: 'bad man'
+            })
+            yield call(delay, 200)
+            const lovers = yield select(state => state.test.lovers)
+            lovers[1] = payload
+            yield call(delay, 500)
+            yield put({
+              type: 'test/setLovers',
+              payload: lovers
+            })
+          }
+        }
       }
     }
-  })
-  const store = s.store()
+  }).store()
   store.dispatch({
     type: 'test/replaceSecondLover',
     payload: {
