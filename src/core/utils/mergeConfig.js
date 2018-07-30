@@ -1,6 +1,4 @@
-
-export default {
-  mergeConfig (config) {
-    return config
-  }
+// TODO: merge config
+export function mergeConfig (config) {
+  return config
 }

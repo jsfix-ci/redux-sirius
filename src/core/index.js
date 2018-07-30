@@ -5,10 +5,11 @@ import { createStore, applyMiddleware, combineReducers } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import * as sagaEffects from 'redux-saga/effects'
 import { addPrefix, addSetPrefix } from './utils/prefix'
+import { mergeConfig } from './utils/mergeConfig'
 
 class Sirius {
   constructor (config) {
-    this.config = config || {}
+    this.config = mergeConfig(config)
     this._models = []
   }
   model (m) {
