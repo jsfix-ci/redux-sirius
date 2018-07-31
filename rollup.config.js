@@ -3,7 +3,8 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 import replace from 'rollup-plugin-replace'
 import commonJs from 'rollup-plugin-commonjs'
 import { minify } from 'uglify-es'
-// 参考https://github.com/reduxjs/redux/blob/master/rollup.config.js
+import babel from 'rollup-plugin-babel'
+
 const env = process.env.NODE_ENV
 const config = {
   input: 'src/index.js',
@@ -16,6 +17,18 @@ if (env === 'development' || env === 'production') {
   config.output = { format: 'umd', name: 'Sirius', indent: false }
   config.plugins.push(
     commonJs(),
+    // https://github.com/rollup/rollup-plugin-babel#configuring-babel
+    babel({
+      babelrc: false,
+      presets: [
+        ['env', { modules: false }]
+      ],
+      exclude: 'node_modules',
+      plugins: [
+        'transform-object-rest-spread',
+        'external-helpers'
+      ]
+    }),
     nodeResolve({
       jsnext: true
     })
