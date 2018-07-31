@@ -1,6 +1,6 @@
 {
   "name": "redux-sirius",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A framework to integrate redux and redux-saga together",
   "main": "dist/sirius.js",
   "scripts": {

@@ -1,10 +1,9 @@
 # directories
-lib
 src
-examples
+examples/*
 .vscode
 coverage
-
+node_modules
 # files
 .gitignore
 yarn.lock
