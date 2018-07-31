@@ -155,3 +155,42 @@ test('Model with sagas', async () => {
     sex: 10
   })
 })
+
+test('Dynamic add model', async () => {
+  const s = new Sirius({
+    models: {
+      switch: {
+        state: true,
+        reducers: {
+          switch: state => !state
+        }
+      }
+    }
+  })
+  const store = s.store()
+  let state = store.getState()
+  expect(state.switch).toBe(true)
+  s.addModel({
+    namespace: 'counter',
+    state: 0,
+    reducers: {
+      increment: state => state + 1,
+      decrement: state => state - 1
+    },
+    effects: {
+      * asyncSwitch () {
+        const { put } = effects
+        yield delay(300)
+        yield put({type: 'switch/switch'})
+      }
+    }
+  })
+  state = store.getState()
+  expect(state.counter).toBe(0)
+  store.dispatch({type: 'counter/increment'})
+  store.dispatch({type: 'counter/asyncSwitch'})
+  await delay(300)
+  state = store.getState()
+  expect(state.counter).toBe(1)
+  expect(state.switch).toBe(false)
+})
