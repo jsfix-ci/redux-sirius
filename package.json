@@ -1,5 +1,5 @@
 {
-  "name": "sirius",
+  "name": "redux-sirius",
   "version": "0.1.0",
   "description": "A framework to integrate redux and redux-saga together",
   "main": "dist/sirius.js",
@@ -14,6 +14,9 @@
     "build:es": "cross-env BABEL_ENV=es NODE_ENV=es rollup -c -o es/sirius.js",
     "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development rollup -c -o dist/sirius.js",
     "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production rollup -c -o dist/sirius.min.js"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   },
   "files": [
     "dist",

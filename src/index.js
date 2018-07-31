@@ -116,12 +116,12 @@ function getSagas (model, name) {
  *   }
  * }
  *
- * then sirius will generate a reducer for each state in a preset rule:
+ * then sirius will generate a reducer for each state field following a preset rule:
  *
  * for state loading : form/setLoading
  * for state password : form/setPassword
  *
- * if the state is not a Object , no reducer will be generated automatically. This may be improved in the future.
+ * If the state is not a Object , no reducer will be generated automatically. This may be improved in the future.
  *
  * @param {*} model
  * @param {*} name
