@@ -1,0 +1,10 @@
+# directories
+lib
+src
+examples
+.vscode
+coverage
+
+# files
+.gitignore
+yarn.lock
