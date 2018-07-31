@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import Sirius from 'sirius';
+import Sirius from 'redux-sirius';
 import './index.css';
 import App from './Count';
 

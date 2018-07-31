@@ -5714,6 +5714,13 @@ redux-saga@^0.16.0:
   version "0.16.0"
   resolved "http://registry.npm.taobao.org/redux-saga/download/redux-saga-0.16.0.tgz#0a231db0a1489301dd980f6f2f88d8ced418f724"
 
+redux-sirius@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/redux-sirius/-/redux-sirius-0.1.1.tgz#b237c677e47547d119e2570038f82161c095742f"
+  dependencies:
+    redux "^4.0.0"
+    redux-saga "^0.16.0"
+
 redux@^4.0.0:
   version "4.0.0"
   resolved "http://registry.npm.taobao.org/redux/download/redux-4.0.0.tgz#aa698a92b729315d22b34a0553d7e6533555cc03"
@@ -6130,12 +6137,6 @@ shellwords@^0.1.1:
 signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.2"
   resolved "http://registry.npm.taobao.org/signal-exit/download/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
-
-"sirius@file:../..":
-  version "0.1.0"
-  dependencies:
-    redux "^4.0.0"
-    redux-saga "^0.16.0"
 
 slash@^1.0.0:
   version "1.0.0"

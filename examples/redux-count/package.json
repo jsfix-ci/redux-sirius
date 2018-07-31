@@ -7,7 +7,7 @@
     "react-dom": "^16.4.1",
     "react-redux": "^5.0.7",
     "react-scripts": "1.1.4",
-    "sirius": "file:../../"
+    "redux-sirius": "^0.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
