@@ -29,8 +29,10 @@ class Sirius {
       checkModel(model)
       const handlers = {}
       // generate default reducers by state
-      for (const key of Object.keys(model.state)) {
-        handlers[addSetPrefix(name)(key)] = (state, action) => ({ ...state, [key]: action.payload })
+      if (!Array.isArray(model.state)) {
+        for (const key of Object.keys(model.state)) {
+          handlers[addSetPrefix(name)(key)] = (state, action) => ({ ...state, [key]: action.payload })
+        }
       }
       // add user defined reducers
       for (const r of Object.keys(model.reducers || {})) {
@@ -91,7 +93,7 @@ function mergeReducers (reducers, newReducers) {
   return combineReducers(finalyReduers)
 }
 function checkModel (model) {
-  invariant(model.state, 'model\'s `state` is required')
+  invariant(Object.keys(model).includes('state'), 'model `state` field is required')
   return model
 }
 
