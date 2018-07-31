@@ -42,6 +42,7 @@ import { effects } from 'redux-sirius'
 
 const delay = duration => new Promise(resolve => setTimeout(resolve, duration))
 
+const { put } = effects
 export default {
   state: {
     loading: false,
@@ -61,7 +62,7 @@ export default {
 ```
 **Dispatch actions**
 
-Sirius will generate reducer for each property(`loading` and `count` above) in the model's `state` field (**Only occurs when the state is an Object**) automatically and the action type follows the rule : `<namespace>/set<uppercase first letter of the property>`.
+Sirius will generate reducer for each property(`loading` and `count` above) in the model's `state` field (**Only occurs when the state is an Object but not an Array**) automatically and the action type follows the rule : `<namespace>/set<uppercase first letter of the property>`.
 
 ```js
 import store from './index.js'
