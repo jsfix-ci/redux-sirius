@@ -104,9 +104,31 @@ function getSagas (model, name) {
   return sagas
 }
 
+/**
+ * Create a root reducer based on model state and model reducers
+ *
+ * If you have a model like the below
+ * {
+ *   namespace: 'form',
+ *   state: {
+ *     loading: false,
+ *     password: ''
+ *   }
+ * }
+ *
+ * then sirius will generate a reducer for each state in a preset rule:
+ *
+ * for state loading : form/setLoading
+ * for state password : form/setPassword
+ *
+ * if the state is not a Object , no reducer will be generated automatically. This may be improved in the future.
+ *
+ * @param {*} model
+ * @param {*} name
+ */
 function createRootReducer (model, name) {
   const handlers = {}
-  // auto-generated reducers
+  // auto-generate reducers
   if (!Array.isArray(model.state)) {
     for (const key of Object.keys(model.state)) {
       handlers[addSetPrefix(name)(key)] = (state, action) => ({ ...state, [key]: action.payload })
@@ -121,6 +143,7 @@ function createRootReducer (model, name) {
     } else {
       finalReducer = (state) => state
     }
+    // notice the reducer override ocurrs here
     handlers[addPrefix(name)(r)] = finalReducer
   }
   return (state = model.state, action) => (handlers[action.type] ? handlers[action.type](state, action) : state)
