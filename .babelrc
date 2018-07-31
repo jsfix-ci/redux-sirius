@@ -3,11 +3,6 @@
     "env"
   ],
   "plugins": [
-    [
-      "transform-regenerator",
-      "transform-runtime", {
-        "regenerator": true
-      }
-    ]
+    "transform-object-rest-spread"
   ]
 }
