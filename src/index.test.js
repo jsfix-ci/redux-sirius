@@ -34,12 +34,24 @@ test('Sirius with empty models', () => {
   expect(s._models.length).toBe(0)
 })
 
-test('Model without reducers', () => {
-  const store = new Sirius({
+test('Should use property `key` in `models` as namespace for the model', () => {
+  const s = new Sirius({
     models: {
       test: model0
     }
-  }).store()
+  })
+  s.store()
+  expect(s._models[0].namespace).toBe('test')
+})
+
+test('Model state should be add into the store', () => {
+  const s = new Sirius({
+    models: {
+      test: model0
+    }
+  })
+  const store = s.store()
+  expect(s._models[0].namespace).toBe('test')
   const state = store.getState()
   expect(state.test).toEqual({
     name: 'fuck',
@@ -58,11 +70,13 @@ test('Model without reducers', () => {
 })
 
 test('Model default reducers', () => {
-  const store = new Sirius({
+  const s = new Sirius({
     models: {
       test: model0
     }
-  }).store()
+  })
+  const store = s.store()
+  expect(s._reducers.test).toBeDefined()
   store.dispatch({
     type: 'test/setName',
     payload: '~~~'

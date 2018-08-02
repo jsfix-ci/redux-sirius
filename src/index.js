@@ -10,6 +10,8 @@ class Sirius {
   constructor (config) {
     this.config = mergeConfig(config)
     this._models = []
+    this._effects = []
+    this._sagas = []
   }
 
   /**
@@ -25,7 +27,7 @@ class Sirius {
         [model.namespace]: createRootReducer(model, model.namespace)
       })
     )
-    getSagas(model, model.namespace).forEach(this.runSaga)
+    getSagas.apply(this, [model, model.namespace]).forEach(this.runSaga)
     this._models.push(model)
   }
 
@@ -43,7 +45,8 @@ class Sirius {
       const model = config.models[name]
       checkModel(model)
       reducers[name] = createRootReducer(model, name)
-      sagas.push(...getSagas(model, name))
+      // TODO: maybe use this._sagas?
+      sagas.push(...getSagas.apply(this, [model, name]))
       this._models.push({
         namespace: name,
         ...model
@@ -56,7 +59,6 @@ class Sirius {
     if (!Array.isArray(middlewares)) {
       mws = applyMiddleware(sagaMiddleware)
     } else {
-      // TODO: custom middleware order support
       mws = applyMiddleware(...middlewares, sagaMiddleware)
     }
     this._reducers = reducers
@@ -100,6 +102,7 @@ function getSagas (model, name) {
         yield sagaEffects.takeEvery(sagaKey, model.effects[key])
       })
     })
+    this._sagas[sagaKey] = model.effects[key]
   }
   return sagas
 }
