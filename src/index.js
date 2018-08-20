@@ -5,6 +5,7 @@ import createSagaMiddleware from 'redux-saga'
 import * as sagaEffects from 'redux-saga/effects'
 import { addPrefix, addSetPrefix } from './utils/prefix'
 import { mergeConfig } from './utils/mergeConfig'
+import helpers from './utils/sagaHelperWrappers'
 
 class Sirius {
   constructor (config) {
@@ -30,7 +31,6 @@ class Sirius {
     getSagas.apply(this, [model, model.namespace]).forEach(this.runSaga)
     this._models.push(model)
   }
-
   /**
    * Create the redux store
    *
@@ -40,13 +40,11 @@ class Sirius {
     invariant(!this._store, 'Only support one store')
     const config = this.config
     const reducers = {}
-    const sagas = []
     for (const name of Object.keys(config.models)) {
       const model = config.models[name]
       checkModel(model)
       reducers[name] = createRootReducer(model, name)
-      // TODO: maybe use this._sagas?
-      sagas.push(...getSagas.apply(this, [model, name]))
+      getSagas.apply(this, [model, name])
       this._models.push({
         namespace: name,
         ...model
@@ -72,7 +70,7 @@ class Sirius {
     } else {
       store = createStore(combinedReducer, mws)
     }
-    sagas.forEach(sagaMiddleware.run)
+    this._sagas.forEach(sagaMiddleware.run)
     this._store = store
     this.runSaga = sagaMiddleware.run
     return store
@@ -94,16 +92,47 @@ function checkModel (model) {
 
 function getSagas (model, name) {
   const sagas = []
-  for (const key of Object.keys(model.effects || {})) {
-    const sagaKey = addPrefix(name)(key)
-    // TODO: Only support takeEvery now
-    sagas.push(function * e () {
-      yield sagaEffects.fork(function * t () {
-        yield sagaEffects.takeEvery(sagaKey, model.effects[key])
-      })
-    })
-    this._sagas[sagaKey] = model.effects[key]
+  const _effects = model.effects
+  if (!_effects) {
+    return []
   }
+  // Normally we define sagas with String patterns in helpers like `takeLatest`.
+  // But there are senarioes when we need native sagas with complex patterns.
+  // See https://redux-saga.js.org/docs/api/#takeeverypattern-saga-args about partterns
+  if (typeof _effects === 'function') {
+    const effects = _effects(helpers)
+    for (const key of Object.keys(effects) || []) {
+      const sagaKey = addPrefix(name)(key)
+      sagas.push(effects[key](sagaKey))
+    }
+  } else if (Array.isArray(_effects)) {
+    for (const s of _effects || []) {
+      sagas.push(function * e () {
+        yield sagaEffects.fork(s)
+      })
+    }
+  } else if (typeof _effects === 'object') {
+    // Object effects must follow the pattern `{ default, native }` which
+    // 'default' represents for the functional model-scoped sirius sagas
+    // and 'native' represents for the native redux sagas
+    if (_effects.default && typeof _effects.default) {
+      const effects = _effects.default(helpers)
+      for (const key of Object.keys(effects) || []) {
+        const sagaKey = addPrefix(name)(key)
+        sagas.push(effects[key](sagaKey))
+      }
+    }
+    if (_effects.native && Array.isArray(_effects.native)) {
+      for (const s of _effects.native || []) {
+        sagas.push(function * e () {
+          yield sagaEffects.fork(s)
+        })
+      }
+    }
+  } else {
+    invariant(false, 'Effects must be array, function or object')
+  }
+  this._sagas = this._sagas.concat(sagas)
   return sagas
 }
 

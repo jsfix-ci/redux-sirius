@@ -134,23 +134,37 @@ test('Model with sagas', async () => {
     models: {
       test: {
         ...model0,
-        effects: {
-          * replaceSecondLover ({ payload }) {
-            const { put, select, call } = effects
-            yield put({
-              type: 'test/setName',
-              payload: 'bad man'
-            })
-            yield call(delay, 200)
-            const lovers = yield select(state => state.test.lovers)
-            lovers[1] = payload
-            yield call(delay, 500)
-            yield put({
-              type: 'test/setLovers',
-              payload: lovers
-            })
-          }
-        }
+        effects: ({takeLatest, takeEvery}) => ({
+          replaceSecondLover: takeLatest(
+            function * ({ payload }) {
+              const { put, select, call } = effects
+              yield put({
+                type: 'test/setName',
+                payload: 'bad man'
+              })
+              yield call(delay, 200)
+              const lovers = yield select(state => state.test.lovers)
+              lovers[1] = payload
+              yield call(delay, 500)
+              yield put({
+                type: 'test/setLovers',
+                payload: lovers
+              })
+            }
+          ),
+          add3rdLover: takeEvery(
+            function * ({ payload }) {
+              const { put, select, call } = effects
+              yield call(delay, 300)
+              const lovers = yield select(state => state.test.lovers)
+              lovers.push(payload)
+              yield put({
+                type: 'test/setLovers',
+                payload: lovers
+              })
+            }
+          )
+        })
       }
     }
   }).store()
@@ -168,6 +182,16 @@ test('Model with sagas', async () => {
     name: 'bad man',
     sex: 10
   })
+  const lover3 = {
+    name: 'jesus',
+    sex: null
+  }
+  store.dispatch({
+    type: 'test/add3rdLover',
+    payload: lover3
+  })
+  await delay(300)
+  expect(state.test.lovers[2]).toEqual(lover3)
 })
 
 test('Dynamic add model', async () => {
@@ -191,13 +215,13 @@ test('Dynamic add model', async () => {
       increment: state => state + 1,
       decrement: state => state - 1
     },
-    effects: {
-      * asyncSwitch () {
+    effects: ({takeEvery}) => ({
+      asyncSwitch: takeEvery(function * () {
         const { put } = effects
         yield delay(300)
         yield put({type: 'switch/switch'})
-      }
-    }
+      })
+    })
   })
   state = store.getState()
   expect(state.counter).toBe(0)

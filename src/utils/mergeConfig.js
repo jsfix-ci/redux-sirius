@@ -1,4 +1,3 @@
-// TODO: merge config
 export const defaultConfig = {
   models: {},
   middlewares: [],
