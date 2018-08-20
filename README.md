@@ -87,7 +87,7 @@ For more usage examples, see `examples`
 ### TODO
 
 - [ ] Redux reducer enhancer support
-- [ ] Complete support for all redux-saga helpers
+- [x] Complete support for all redux-saga helpers
 - [ ] Model lifecycle hooks
 - [ ] Customized middleawre order
 - [ ] Typescript interface definitions
