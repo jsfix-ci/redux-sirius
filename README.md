@@ -91,3 +91,6 @@ For more usage examples, see `examples`
 - [ ] Model lifecycle hooks
 - [ ] Customized middleawre order
 - [ ] Typescript interface definitions
+
+### LISENCE
+[MIT](https://tldrlegal.com/license/mit-license)
