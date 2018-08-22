@@ -52,12 +52,12 @@ export default {
     increment: state => ({...state, count: state.count + 1}),
     decrement: state => ({...state, count: state.count - 1}),
   },
-  effects: {
-    *asyncDecrement() {
+  effects: ({takeEvery}) => ({
+    asyncDecrement: takeEvery(function * {
        yield delay(300)
        yield put({type: 'count/decrement'})
-    }
-  }
+    })
+  })
 }
 ```
 **Dispatch actions**
