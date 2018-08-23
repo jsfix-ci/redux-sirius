@@ -5722,9 +5722,9 @@ redux-saga@^0.16.0:
   version "0.16.0"
   resolved "http://registry.npm.taobao.org/redux-saga/download/redux-saga-0.16.0.tgz#0a231db0a1489301dd980f6f2f88d8ced418f724"
 
-redux-sirius@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/redux-sirius/-/redux-sirius-0.1.4.tgz#58073316b6c37191c8f325982f5c136ec6eb5726"
+redux-sirius@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/redux-sirius/-/redux-sirius-0.1.5.tgz#7438d8bd3e594caddddcdcc251901de58e3935bf"
   dependencies:
     redux "^4.0.0"
     redux-saga "^0.16.0"
