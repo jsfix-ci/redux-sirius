@@ -26,7 +26,7 @@ import Sirius from 'redux-sirius'
 import count from './models/count'
 
 const store = new Sirius({
-  models:
+  models: {
     // and namespace for this model will set to 'count'
     count
   }
