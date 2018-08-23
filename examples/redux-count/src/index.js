@@ -1,9 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'babel-polyfill'
 import { Provider } from 'react-redux';
-import Sirius from 'redux-sirius';
+import Sirius, { effects } from 'redux-sirius';
 import './index.css';
 import App from './Count';
+
+const delay = duration => new Promise(resolve => setTimeout(resolve, duration))
 
 const store = new Sirius({
   models: {
@@ -12,7 +15,15 @@ const store = new Sirius({
       reducers: {
         increment: state => state + 1,
         decrement: state => state - 1,
-      }
+        add: (state, { payload }) => state + payload
+      },
+      effects: ({takeEvery}) => ({
+        delayAdd: takeEvery(function * ({ payload }) {
+          const { put } = effects
+          yield delay(300)
+          yield put({ type: 'count/add', payload: 3})
+        })
+      })
     }
   }
 }).store()
