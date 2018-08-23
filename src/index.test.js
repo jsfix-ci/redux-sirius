@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import Sirius, { effects } from './index'
+import Sirius, {effects} from './index'
 
 const delay = duration => new Promise(resolve => setTimeout(resolve, duration))
 // no namespace / no reducers / no effects

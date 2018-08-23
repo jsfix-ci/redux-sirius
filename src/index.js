@@ -181,5 +181,5 @@ function createRootReducer (model, name) {
   return (state = model.state, action) => (handlers[action.type] ? handlers[action.type](state, action) : state)
 }
 
-exports.effects = sagaEffects
+export const effects = sagaEffects
 export default Sirius
