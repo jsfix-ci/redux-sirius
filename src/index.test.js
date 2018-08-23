@@ -232,3 +232,17 @@ test('Dynamic add model', async () => {
   expect(state.counter).toBe(1)
   expect(state.switch).toBe(false)
 })
+
+test('Middlewares should be added', () => {
+  let flag = 0
+  const customeMiddleware = ({dispatch, getState}) => next => action => {
+    if (action.type === 'test/middleware') {
+      flag += 1
+    }
+  }
+  const store = new Sirius({
+    middlewares: [customeMiddleware]
+  }).store()
+  store.dispatch({type: 'test/middleware'})
+  expect(flag).toBe(1)
+})

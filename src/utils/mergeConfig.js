@@ -7,14 +7,15 @@ export const defaultConfig = {
   }
 }
 const merge = (origin, replacer) => {
-  return replacer ? { ...replacer, ...(origin || {}) } : origin || {}
+  return replacer ? { ...origin, ...(replacer || {}) } : origin || {}
 }
 
 export function mergeConfig (config) {
   if (!config) return defaultConfig
   return {
     models: merge(defaultConfig.models, config.models),
-    middlewares: merge(defaultConfig.middlewares, config.middlewares),
-    devtools: config.devtools ? config.devtools : defaultConfig.devtools
+    middlewares: config.middlewares || [],
+    // devtools: config.devtools ? config.devtools : defaultConfig.devtools
+    devtools: merge(defaultConfig.devtools, config.devtools)
   }
 }
