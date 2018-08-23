@@ -239,6 +239,7 @@ test('Middlewares should be added', () => {
     if (action.type === 'test/middleware') {
       flag += 1
     }
+    next()
   }
   const store = new Sirius({
     middlewares: [customeMiddleware]
