@@ -1,6 +1,6 @@
 # Sirius
 
-A simple framework for manage redux store
+A simple framework to manage redux store
 
 [![npm version](https://badge.fury.io/js/redux-sirius.svg)](https://badge.fury.io/js/redux-sirius)
 
