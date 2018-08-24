@@ -233,6 +233,38 @@ test('Dynamic add model', async () => {
   expect(state.switch).toBe(false)
 })
 
+test('Default enable thunk middleware', async () => {
+  const s = new Sirius({
+    models: {
+      count: {
+        state: 0
+      }
+    }
+  })
+  expect(s.config.enableThunk).toBe(true)
+  let test = false
+  const store = s.store()
+  store.dispatch(async () => {
+    await delay(1000)
+    test = true
+  })
+  await delay(1000)
+  expect(test).toBe(true)
+})
+
+test('Disable the thunk middleware', async () => {
+  const s = new Sirius({
+    enableThunk: false
+  })
+  expect(s.config.enableThunk).toBe(false)
+  const store = s.store()
+  try {
+    store.dispatch(async () => {})
+  } catch (error) {
+    expect(error.message).toBe('Actions must be plain objects. Use custom middleware for async actions.')
+  }
+})
+
 test('Middlewares should be added', () => {
   let flag = 0
   const customeMiddleware = ({dispatch, getState}) => next => action => {

@@ -4,6 +4,7 @@ import { createStore, applyMiddleware, combineReducers } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import * as sagaEffects from 'redux-saga/effects'
 import { addPrefix, addSetPrefix } from './utils/prefix'
+import { thunkMiddleware } from './utils/thunk'
 import { mergeConfig } from './utils/mergeConfig'
 import helpers from './utils/sagaHelperWrappers'
 
@@ -57,6 +58,9 @@ class Sirius {
     if (!Array.isArray(middlewares)) {
       mws = applyMiddleware(sagaMiddleware)
     } else {
+      if (config.enableThunk) {
+        middlewares.push(thunkMiddleware)
+      }
       mws = applyMiddleware(...middlewares, sagaMiddleware)
     }
     this._reducers = reducers
