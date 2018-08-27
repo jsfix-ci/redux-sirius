@@ -68,7 +68,7 @@ test('Model\'s `state` should be add into the store', () => {
   })
 })
 
-test('Model should have default reducers', () => {
+test('Model should have default \'set-prefixed\' reducers', () => {
   const s = new Sirius({
     models: {
       test: model0
@@ -82,6 +82,25 @@ test('Model should have default reducers', () => {
   })
   const state = store.getState()
   expect(state.test.name).toBe('~~~')
+})
+
+test('Model shoud have \'merge\' reducer', () => {
+  const s = new Sirius({
+    models: {
+      test: model0
+    }
+  })
+  const store = s.store()
+  store.dispatch({
+    type: 'test/merge',
+    payload: {
+      name: 'merge',
+      value: 999
+    }
+  })
+  const state = store.getState()
+  expect(state.test.name).toBe('merge')
+  expect(state.test.value).toBe(999)
 })
 
 test('Model\'s `reducers` should be added as reducers ', () => {

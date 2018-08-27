@@ -7,6 +7,7 @@ import { addPrefix, addSetPrefix } from './utils/prefix'
 import { thunkMiddleware } from './utils/thunk'
 import { mergeConfig } from './utils/mergeConfig'
 import helpers from './utils/sagaHelperWrappers'
+import { isNotNullObject, includeKey, isNotArrayObject, includeNewKeys } from './utils/common'
 
 class Sirius {
   constructor (config) {
@@ -157,7 +158,13 @@ function getSagas (model, name) {
  * for state loading : form/setLoading
  * for state password : form/setPassword
  *
- * If the state is not an Object , no reducer will be generated automatically. This may be improved in the future.
+ * And a reducer receving action whose type is '<namespace>/merge' (in the senario above is 'form/merge')
+ * will be generated.
+ * If the state is an Object (not Array, not null), the action payload must be a 'sub-object' of the state
+ * which means all the properties of payload can be also found in the state. the 'merge' reducer will
+ * do a 'merge-like' action to the state just like Object Spreading.
+ *
+ * If the state is not an Object, reducer replace the state with payload directly.
  *
  * @param {*} model
  * @param {*} name
@@ -165,9 +172,26 @@ function getSagas (model, name) {
 function createRootReducer (model, name) {
   const handlers = {}
   // auto-generate reducers
-  if (!Array.isArray(model.state)) {
+  if (isNotNullObject(model.state)) {
     for (const key of Object.keys(model.state)) {
-      handlers[addSetPrefix(name)(key)] = (state, action) => (action.payload ? { ...state, [key]: action.payload } : state)
+      handlers[addSetPrefix(name)(key)] = (state, action) => (includeKey(action, 'payload') ? { ...state, [key]: action.payload } : state)
+    }
+  }
+  // reducer for updating multiple field of the state in one action
+  // or replace the state directly
+  handlers[addPrefix(name)('merge')] = (state, action) => {
+    if (!includeKey(action, 'payload')) {
+      return state
+    }
+    const payload = action.payload
+    if (isNotArrayObject(state)) {
+      if (includeNewKeys(state, payload)) {
+        return state
+      } else {
+        return { ...state, ...payload }
+      }
+    } else {
+      return payload
     }
   }
   // user defined reducers
