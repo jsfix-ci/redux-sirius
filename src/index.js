@@ -157,7 +157,7 @@ function getSagas (model, name) {
  * for state loading : form/setLoading
  * for state password : form/setPassword
  *
- * If the state is not a Object , no reducer will be generated automatically. This may be improved in the future.
+ * If the state is not an Object , no reducer will be generated automatically. This may be improved in the future.
  *
  * @param {*} model
  * @param {*} name
@@ -167,7 +167,7 @@ function createRootReducer (model, name) {
   // auto-generate reducers
   if (!Array.isArray(model.state)) {
     for (const key of Object.keys(model.state)) {
-      handlers[addSetPrefix(name)(key)] = (state, action) => ({ ...state, [key]: action.payload })
+      handlers[addSetPrefix(name)(key)] = (state, action) => (action.payload ? { ...state, [key]: action.payload } : state)
     }
   }
   // user defined reducers

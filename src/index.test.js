@@ -128,6 +128,17 @@ test('Model\'s `reducers` should be added as reducers ', () => {
   })
 })
 
+test('Actions without `payload` do nothing to the state', () => {
+  const store = new Sirius({
+    models: {
+      test: model0
+    }
+  }).store()
+  store.dispatch({type: 'test/setName'})
+  const state = store.getState()
+  expect(state.test.name).toBe('fuck')
+})
+
 test('Model\'s `effects` should be added as sagas', async () => {
   const store = new Sirius({
     models: {
