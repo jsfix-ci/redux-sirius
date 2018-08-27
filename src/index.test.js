@@ -34,7 +34,7 @@ test('Sirius with empty models', () => {
   expect(s._models.length).toBe(0)
 })
 
-test('Should use property `key` in `models` as namespace for the model', () => {
+test('Model\'s namespace should be the key in config', () => {
   const s = new Sirius({
     models: {
       test: model0
@@ -44,14 +44,13 @@ test('Should use property `key` in `models` as namespace for the model', () => {
   expect(s._models[0].namespace).toBe('test')
 })
 
-test('Model state should be add into the store', () => {
+test('Model\'s `state` should be add into the store', () => {
   const s = new Sirius({
     models: {
       test: model0
     }
   })
   const store = s.store()
-  expect(s._models[0].namespace).toBe('test')
   const state = store.getState()
   expect(state.test).toEqual({
     name: 'fuck',
@@ -69,7 +68,7 @@ test('Model state should be add into the store', () => {
   })
 })
 
-test('Model default reducers', () => {
+test('Model should have default reducers', () => {
   const s = new Sirius({
     models: {
       test: model0
@@ -85,7 +84,7 @@ test('Model default reducers', () => {
   expect(state.test.name).toBe('~~~')
 })
 
-test('Model with customized reducers', () => {
+test('Model\'s `reducers` should be added as reducers ', () => {
   const store = new Sirius({
     models: {
       test: {
@@ -129,7 +128,7 @@ test('Model with customized reducers', () => {
   })
 })
 
-test('Model with sagas', async () => {
+test('Model\'s `effects` should be added as sagas', async () => {
   const store = new Sirius({
     models: {
       test: {
