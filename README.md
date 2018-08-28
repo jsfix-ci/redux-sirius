@@ -68,7 +68,7 @@ export default {
 ```js
 import store from './index.js'
 
-// all action types below are auto-generated
+// 'count/setCount' is auto-generated
 store.dispatch({
   type: 'count/setCount',
   payload: 10
