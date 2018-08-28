@@ -7,6 +7,10 @@ const model0 = {
   state: {
     name: 'fuck',
     value: 0,
+    info: {
+      height: 180,
+      weight: 150
+    },
     lovers: [
       {
         name: 'qwe',
@@ -55,6 +59,10 @@ test('Model\'s `state` should be add into the store', () => {
   expect(state.test).toEqual({
     name: 'fuck',
     value: 0,
+    info: {
+      height: 180,
+      weight: 150
+    },
     lovers: [
       {
         name: 'qwe',
@@ -140,7 +148,7 @@ test('\'merge\' reducer only merge the existent field of state', () => {
   })
 })
 
-test('Model\'s `reducers` should be added as reducers ', () => {
+test('Model \'reducers\' should be added as reducers ', () => {
   const store = new Sirius({
     models: {
       test: {
@@ -155,10 +163,18 @@ test('Model\'s `reducers` should be added as reducers ', () => {
           },
           setFirstLover: (state, { payload }) => {
             const { lovers } = state
-            lovers[0] = payload
+            const newLovers = lovers.map((lover, i) => {
+              if (i !== 0) {
+                return lover
+              }
+              return {
+                ...lover,
+                ...payload
+              }
+            })
             return {
               ...state,
-              lovers
+              lovers: [...newLovers]
             }
           }
         }
@@ -195,7 +211,7 @@ test('Actions without `payload` do nothing to the state', () => {
   expect(state.test.name).toBe('fuck')
 })
 
-test('Model\'s `effects` should be added as sagas', async () => {
+test('Model \'effects\' should be added as sagas', async () => {
   const store = new Sirius({
     models: {
       test: {
@@ -210,23 +226,21 @@ test('Model\'s `effects` should be added as sagas', async () => {
               })
               yield call(delay, 200)
               const lovers = yield select(state => state.test.lovers)
-              lovers[1] = payload
               yield call(delay, 500)
               yield put({
                 type: 'test/setLovers',
-                payload: lovers
+                payload: [...lovers.slice(0, 1), payload, ...lovers.slice(2)]
               })
             }
           ),
-          add3rdLover: takeEvery(
+          addLover: takeEvery(
             function * ({ payload }) {
               const { put, select, call } = effects
               yield call(delay, 300)
               const lovers = yield select(state => state.test.lovers)
-              lovers.push(payload)
               yield put({
                 type: 'test/setLovers',
-                payload: lovers
+                payload: [...lovers.slice(), payload]
               })
             }
           )
@@ -241,8 +255,8 @@ test('Model\'s `effects` should be added as sagas', async () => {
       sex: 10
     }
   })
-  await delay(700)
-  const state = store.getState()
+  await delay(800)
+  let state = store.getState()
   expect(state.test.name).toBe('bad man')
   expect(state.test.lovers[1]).toEqual({
     name: 'bad man',
@@ -253,10 +267,11 @@ test('Model\'s `effects` should be added as sagas', async () => {
     sex: null
   }
   store.dispatch({
-    type: 'test/add3rdLover',
+    type: 'test/addLover',
     payload: lover3
   })
-  await delay(300)
+  await delay(400)
+  state = store.getState()
   expect(state.test.lovers[2]).toEqual(lover3)
 })
 
@@ -344,4 +359,27 @@ test('Middlewares should be added', () => {
   }).store()
   store.dispatch({type: 'test/middleware'})
   expect(flag).toBe(1)
+})
+
+test('Model should be untouched', () => {
+  expect(model0.state).toEqual(
+    {
+      name: 'fuck',
+      value: 0,
+      info: {
+        height: 180,
+        weight: 150
+      },
+      lovers: [
+        {
+          name: 'qwe',
+          sex: 1
+        },
+        {
+          name: 'ewq',
+          sex: 0
+        }
+      ]
+    }
+  )
 })
