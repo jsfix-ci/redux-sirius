@@ -103,7 +103,7 @@ test('Model shoud have \'merge\' reducer', () => {
   expect(state.test.value).toBe(999)
 })
 
-test('\'merge\' reducer only merge the existent first level field of state', () => {
+test('\'merge\' reducer only merge the existent field of state', () => {
   const store = new Sirius({
     models: {
       test: {
