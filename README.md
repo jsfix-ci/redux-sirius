@@ -137,12 +137,12 @@ store.dispatch({
 
 #### Merge Action : `<namespace>/merge`
 
-If you want to updating multiple state fields, this reducer will be very helpful.
+If you want to update multiple state fields, this reducer will be very helpful.
 
 But you need to pay extra attention when using this:
 - Although 'merge' reducer is powerful and convenient, it's highly recommended to use 'set-prefiexed' reducer to **update a single field** of the state because 'merge' is not as specific as 'setXXX' when dispatching the action and 'merge' reducer does extra checking to ensure not bringing new field into the state to avoid making codes more confused.
 - Only the fields that the state include will be merged in the payload.
-- If the state is not an Object or 'un-spreadable' (primitive type state like `{ state:0 }`), this reducer will replace the state with payload directly.
+- If state is not an Object or 'un-spreadable' (primitive type state like `{ state:0 }`), this reducer will replace it with payload directly.
 
 ```js
 store.dispatch({
