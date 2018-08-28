@@ -123,7 +123,7 @@ test('\'merge\' reducer only merge the existent field of state', () => {
       name: 'merge',
       job: 'student',
       information: {
-        height: 180,
+        height: 150,
         address: 'test address'
       }
     }
@@ -135,7 +135,7 @@ test('\'merge\' reducer only merge the existent field of state', () => {
   expect(state.test.job).toBeUndefined()
   // ignore 'information.address'
   expect(state.test.information).toEqual({
-    height: 180,
+    height: 150,
     weight: 200
   })
 })
