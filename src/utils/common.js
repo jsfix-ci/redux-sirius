@@ -16,25 +16,34 @@ export const includeNewKeys = (obj, ...payloads) => {
 
 // 'obj' and 'payloads' should be an Object but not an array
 // ignore the prototype of 'obj'
-export const deriveObject = (obj, ...payloads) => {
-  const originKeys = Object.keys(obj)
-  return payloads.reduce((o, payload) => {
-    // use '.reduce' instead of for-loop to improve performance ?
-    for (const k of Object.keys(payload)) {
-      if (originKeys.length === 0) {
-        o = payload
-      } else {
-        if (originKeys.includes(k)) {
-          const _old = o[k]
-          const _new = payload[k]
+export const pureMerge = (obj, ...payloads) =>
+  payloads.reduce((res, payload) => {
+    const originKeys = Object.keys(res)
+    // empty origin object, use payload as next
+    if (originKeys.length === 0) {
+      return payload
+    } else {
+      const payloadKeys = Object.keys(payload)
+      // do merge
+      return payloadKeys.reduce((_res, key) => {
+        // ignore new field
+        if (originKeys.includes(key)) {
+          const _old = _res[key]
+          const _new = payload[key]
+          // both old and new value are Objects, merge recursively
           if (isNotNullObject(_old) && isNotNullObject(_new)) {
-            o[k] = deriveObject(_old, _new)
+            return {
+              ..._res,
+              [key]: pureMerge(_old, _new)
+            }
           } else {
-            o[k] = payload[k]
+            return {
+              ..._res,
+              [key]: _new
+            }
           }
         }
-      }
+        return _res
+      }, res)
     }
-    return o
   }, obj)
-}

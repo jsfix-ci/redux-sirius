@@ -92,7 +92,7 @@ test('Model should have default \'set-prefixed\' reducers', () => {
   expect(state.test.name).toBe('~~~')
 })
 
-test('Model shoud have \'merge\' reducer', () => {
+test('Model should have \'merge\' reducer', () => {
   const s = new Sirius({
     models: {
       test: model0
@@ -114,15 +114,7 @@ test('Model shoud have \'merge\' reducer', () => {
 test('\'merge\' reducer only merge the existent field of state', () => {
   const store = new Sirius({
     models: {
-      test: {
-        state: {
-          ...model0.state,
-          information: {
-            height: 180,
-            weight: 200
-          }
-        }
-      }
+      test: model0
     }
   }).store()
   store.dispatch({
@@ -130,7 +122,7 @@ test('\'merge\' reducer only merge the existent field of state', () => {
     payload: {
       name: 'merge',
       job: 'student',
-      information: {
+      info: {
         height: 150,
         address: 'test address'
       }
@@ -141,10 +133,10 @@ test('\'merge\' reducer only merge the existent field of state', () => {
   expect(state.test.name).toBe('merge')
   // ignore 'job'
   expect(state.test.job).toBeUndefined()
-  // ignore 'information.address'
-  expect(state.test.information).toEqual({
+  // ignore 'info.address'
+  expect(state.test.info).toEqual({
     height: 150,
-    weight: 200
+    weight: 150
   })
 })
 

@@ -7,7 +7,7 @@ import { addPrefix, addSetPrefix } from './utils/prefix'
 import { thunkMiddleware } from './utils/thunk'
 import { mergeConfig } from './utils/mergeConfig'
 import helpers from './utils/sagaHelperWrappers'
-import { isNotNullObject, includeKey, isNotArrayObject, includeNewKeys, deriveObject } from './utils/common'
+import { isNotNullObject, includeKey, isNotArrayObject, includeNewKeys, pureMerge } from './utils/common'
 
 class Sirius {
   constructor (config) {
@@ -171,10 +171,11 @@ function getSagas (model, name) {
  */
 function createRootReducer (model, name) {
   const handlers = {}
-  // auto-generate reducers
-  if (isNotNullObject(model.state)) {
-    for (const key of Object.keys(model.state)) {
-      handlers[addSetPrefix(name)(key)] = (state, action) => (includeKey(action, 'payload') ? { ...state, [key]: action.payload } : state)
+  const initialState = model.state
+  // auto-generated reducers
+  if (isNotNullObject(initialState)) {
+    for (const key of Object.keys(initialState)) {
+      handlers[addSetPrefix(name)(key)] = (state, action) => includeKey(action, 'payload') ? { ...state, [key]: action.payload } : state
     }
   }
   // reducer for updating multiple field of the state in one action
@@ -186,8 +187,7 @@ function createRootReducer (model, name) {
     const payload = action.payload
     if (isNotArrayObject(state)) {
       if (includeNewKeys(state, payload)) {
-        // Maybe any improvement here ?
-        return {...state, ...deriveObject(state, payload)}
+        return pureMerge(state, payload)
       } else {
         return { ...state, ...payload }
       }
