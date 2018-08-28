@@ -353,6 +353,7 @@ test('Middlewares should be added', () => {
   expect(flag).toBe(1)
 })
 
+// this test must be executed after all the tests finish running
 test('Model should be untouched', () => {
   expect(model0.state).toEqual(
     {

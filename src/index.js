@@ -7,7 +7,7 @@ import { addPrefix, addSetPrefix } from './utils/prefix'
 import { thunkMiddleware } from './utils/thunk'
 import { mergeConfig } from './utils/mergeConfig'
 import helpers from './utils/sagaHelperWrappers'
-import { isNotNullObject, includeKey, isNotArrayObject, includeNewKeys, pureMerge } from './utils/common'
+import { isNotNullObject, includeKey, isNotArrayObject, pureMerge } from './utils/common'
 
 class Sirius {
   constructor (config) {
@@ -158,10 +158,10 @@ function getSagas (model, name) {
  * for state loading : form/setLoading
  * for state password : form/setPassword
  *
- * And a reducer receving action whose type is '<namespace>/merge' (in the senario above is 'form/merge')
+ * And a reducer receiving action whose type is '<namespace>/merge' (in the senario above is 'form/merge')
  * will be generated.
- * If the state is an Object (not Array, not null), the action payload must be a 'sub-object' of the state
- * which means all the properties of payload can be also found in the state. the 'merge' reducer will
+ * If state is an Object (not Array, not null), action payload must be a 'sub-object' of the state
+ * which means all the fields of payload can be also found in the state. the 'merge' reducer will
  * do a 'merge-like' action to the state just like Object Spreading.
  *
  * If the state is not an Object, reducer replace the state with payload directly.
@@ -186,11 +186,12 @@ function createRootReducer (model, name) {
     }
     const payload = action.payload
     if (isNotArrayObject(state)) {
-      if (includeNewKeys(state, payload)) {
-        return pureMerge(state, payload)
-      } else {
-        return { ...state, ...payload }
-      }
+      // if (includeNewKeys(state, payload)) {
+      //   return pureMerge(state, payload)
+      // } else {
+      //   return { ...state, ...payload }
+      // }
+      return pureMerge(state, payload)
     } else {
       return payload
     }
