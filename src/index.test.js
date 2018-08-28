@@ -103,6 +103,7 @@ test('Model shoud have \'merge\' reducer', () => {
   expect(state.test.value).toBe(999)
 })
 
+test('\'merge\' reducer ')
 test('Model\'s `reducers` should be added as reducers ', () => {
   const store = new Sirius({
     models: {
