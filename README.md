@@ -30,7 +30,7 @@ const store = new Sirius({
     // and namespace for this model will be set to 'count'
     count
   }
-})
+}).store()
 
 export default store
 ```
@@ -85,6 +85,8 @@ store.dispatch({
 ```
 ### Saga Support
 
+> TODO
+
 ### Conventional Reducers
 
 The conventional reducers are generated automatically by 'redux-sirius' to fit requirements in most redux developing senarioes such as updating a single field of the state.
@@ -101,9 +103,6 @@ export default {
     sex: 0,
     weight: 100,
     height: 180,
-  },
-  reducers: {
-
   }
 }
 ```
@@ -123,9 +122,9 @@ const store = new Sirius({
 
 Then let's dispatch actions
 
-#### Action `<namespace>/set<uppercase the first letter of field name>`
+#### 'Set-Prefixed' Action : `<namespace>/set<uppercase the first letter of field name>`
 
-`redux-sirius` will generate a reducer for each property in the model's `state` field (**so this only occurs when the state is an Object but not an Array**) and the action type follows the rule : `<namespace>/set<uppercase the first letter of field name>`.
+`redux-sirius` will generate a reducer for each field in the model's `state` (**so this only occurs when the state is an Object but not an Array**) and action type follows the rule : `<namespace>/set<uppercase the first letter of field name>`.
 
 ```js
 store.dispatch({
@@ -136,12 +135,12 @@ store.dispatch({
 // Then state.person.name will be 'Tim'
 ```
 
-#### Action `<namespace>/merge`
+#### Merge Action : `<namespace>/merge`
 
-If you want to updating multiple fields of the state, this reducer will be very helpful.
+If you want to updating multiple state fields, this reducer will be very helpful.
 
 But you need to pay extra attention when using this:
-- Although 'merge' reducer is powerful and convenient, it's recommended to use 'set-prefiexed' reducer to **update a single field** of the state because 'merge' is not as specific as 'setXXX' when dispatching the action and 'merge' reducer does extra checking to ensure not bringing new field into the state to avoid making codes more confused.
+- Although 'merge' reducer is powerful and convenient, it's highly recommended to use 'set-prefiexed' reducer to **update a single field** of the state because 'merge' is not as specific as 'setXXX' when dispatching the action and 'merge' reducer does extra checking to ensure not bringing new field into the state to avoid making codes more confused.
 - Only the fields that the state include will be merged in the payload.
 - If the state is not an Object or 'un-spreadable' (primitive type state like `{ state:0 }`), this reducer will replace the state with payload directly.
 
@@ -158,6 +157,8 @@ store.dispatch({
 ```
 
 ### Config Options
+
+> TODO
 
 ## TODO
 
