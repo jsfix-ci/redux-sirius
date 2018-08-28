@@ -103,7 +103,43 @@ test('Model shoud have \'merge\' reducer', () => {
   expect(state.test.value).toBe(999)
 })
 
-test('\'merge\' reducer ')
+test('\'merge\' reducer only merge the existent first level field of state', () => {
+  const store = new Sirius({
+    models: {
+      test: {
+        state: {
+          ...model0.state,
+          information: {
+            height: 180,
+            weight: 200
+          }
+        }
+      }
+    }
+  }).store()
+  store.dispatch({
+    type: 'test/merge',
+    payload: {
+      name: 'merge',
+      job: 'student',
+      information: {
+        height: 180,
+        address: 'test address'
+      }
+    }
+  })
+  const state = store.getState()
+  // 'name' works
+  expect(state.test.name).toBe('merge')
+  // ignore 'job'
+  expect(state.test.job).toBeUndefined()
+  // ignore 'information.address'
+  expect(state.test.information).toEqual({
+    height: 180,
+    weight: 200
+  })
+})
+
 test('Model\'s `reducers` should be added as reducers ', () => {
   const store = new Sirius({
     models: {

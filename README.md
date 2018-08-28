@@ -141,8 +141,7 @@ If you want to update multiple state fields, this reducer will be very helpful.
 
 But you need to pay extra attention when using this:
 - Although `merge` reducer is powerful and convenient, **it's highly recommended to use `set-prefixed` reducer to update a single state field** because `merge` is not as specific as 'setXXX' when dispatching the action and `merge` reducer does extra checking to ensure not bringing new field into the state to avoid making codes more confused.
-- `redux-sirius` only checks **the first level state field** for you which means that new nested fields can be bought into state.
-- Only the fields that state includes will be merged in the payload.
+- Only the fields that state includes will be merged in the payload. But a empty object field (like `{ state: {} }`) will be directly replaced by payload.
 - If state is not an Object or 'un-spreadable' (primitive type state like `{ state:0 }`), this reducer will replace it with payload directly.
 
 ```js

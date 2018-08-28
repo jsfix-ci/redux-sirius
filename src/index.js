@@ -7,7 +7,7 @@ import { addPrefix, addSetPrefix } from './utils/prefix'
 import { thunkMiddleware } from './utils/thunk'
 import { mergeConfig } from './utils/mergeConfig'
 import helpers from './utils/sagaHelperWrappers'
-import { isNotNullObject, includeKey, isNotArrayObject, includeNewKeys } from './utils/common'
+import { isNotNullObject, includeKey, isNotArrayObject, includeNewKeys, deriveObject } from './utils/common'
 
 class Sirius {
   constructor (config) {
@@ -186,7 +186,8 @@ function createRootReducer (model, name) {
     const payload = action.payload
     if (isNotArrayObject(state)) {
       if (includeNewKeys(state, payload)) {
-        return state
+        // Maybe any improvement here ?
+        return {...state, ...deriveObject(state, payload)}
       } else {
         return { ...state, ...payload }
       }

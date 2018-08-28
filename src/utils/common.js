@@ -13,3 +13,28 @@ export const includeNewKeys = (obj, ...payloads) => {
   const allKeys = Object.keys(obj).concat(payloads.reduce((keys, p) => keys.concat(Object.keys(p)), []))
   return originKeys.length !== new Set(allKeys).size
 }
+
+// 'obj' and 'payloads' should be an Object but not an array
+// ignore the prototype of 'obj'
+export const deriveObject = (obj, ...payloads) => {
+  const originKeys = Object.keys(obj)
+  return payloads.reduce((o, payload) => {
+    // use '.reduce' instead of for-loop to improve performance ?
+    for (const k of Object.keys(payload)) {
+      if (originKeys.length === 0) {
+        o = payload
+      } else {
+        if (originKeys.includes(k)) {
+          const _old = o[k]
+          const _new = payload[k]
+          if (isNotNullObject(_old) && isNotNullObject(_new)) {
+            o[k] = deriveObject(_old, _new)
+          } else {
+            o[k] = payload[k]
+          }
+        }
+      }
+    }
+    return o
+  }, obj)
+}
