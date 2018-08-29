@@ -72,8 +72,7 @@ class Sirius {
     }
     this._reducers = reducers
     const combinedReducer = mergeReducers(reducers)
-    // eslint-disable-next-line no-undef
-    if (__DEV__ && this.config.devtools.enable) {
+    if (this.config.devtools.enable) {
       store = createStore(combinedReducer,
         // redux devtools support
         window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(this.config.devtools.options),
