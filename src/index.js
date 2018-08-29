@@ -42,15 +42,20 @@ class Sirius {
     invariant(!this._store, 'Only support one store')
     const config = this.config
     const reducers = {}
+    let namespace = ''
     for (const name of Object.keys(config.models)) {
       const model = config.models[name]
       checkModel(model)
-      reducers[name] = createRootReducer(model, name)
-      getSagas.apply(this, [model, name])
-      this._models.push({
-        namespace: name,
-        ...model
-      })
+      // if 'namespace' is defined by user, ignore the key of model in 'models'
+      if (model.namespace) {
+        namespace = model.namespace
+      } else {
+        model.namespace = name
+        namespace = name
+      }
+      reducers[namespace] = createRootReducer(model, namespace)
+      getSagas.apply(this, [model, namespace])
+      this._models.push(model)
     }
     let store
     const sagaMiddleware = createSagaMiddleware()

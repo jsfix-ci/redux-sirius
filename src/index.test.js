@@ -38,7 +38,7 @@ test('Sirius with empty models', () => {
   expect(s._models.length).toBe(0)
 })
 
-test('Model\'s namespace should be the key in config', () => {
+test('Model\'s namespace should be the key in config if not defined', () => {
   const s = new Sirius({
     models: {
       test: model0
@@ -46,6 +46,19 @@ test('Model\'s namespace should be the key in config', () => {
   })
   s.store()
   expect(s._models[0].namespace).toBe('test')
+})
+
+test('Should use model\'s \'namespace\' if defined', () => {
+  const s = new Sirius({
+    models: {
+      test: {
+        namespace: 'person',
+        ...model0
+      }
+    }
+  })
+  s.store()
+  expect(s._models[0].namespace).toBe('person')
 })
 
 test('Model\'s `state` should be add into the store', () => {
