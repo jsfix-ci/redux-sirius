@@ -47,15 +47,16 @@ class Sirius {
       const model = config.models[name]
       checkModel(model)
       // if 'namespace' is defined by user, ignore the key of model in 'models'
+      namespace = name
       if (model.namespace) {
         namespace = model.namespace
-      } else {
-        model.namespace = name
-        namespace = name
       }
       reducers[namespace] = createRootReducer(model, namespace)
       getSagas.apply(this, [model, namespace])
-      this._models.push(model)
+      this._models.push({
+        namespace,
+        ...model
+      })
     }
     let store
     const sagaMiddleware = createSagaMiddleware()
