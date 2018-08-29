@@ -1,6 +1,5 @@
 import { uglify } from 'rollup-plugin-uglify'
 import nodeResolve from 'rollup-plugin-node-resolve'
-import replace from 'rollup-plugin-replace'
 import commonJs from 'rollup-plugin-commonjs'
 import { minify } from 'uglify-es'
 import babel from 'rollup-plugin-babel'
@@ -34,18 +33,18 @@ if (env === 'development' || env === 'production') {
     })
   )
 }
-if (env === 'development') {
-  config.plugins.push(
-    replace({
-      __DEV__: true
-    })
-  )
-}
+// if (env === 'development') {
+//   config.plugins.push(
+//     replace({
+//       __DEV__: true
+//     })
+//   )
+// }
 if (env === 'production') {
   config.plugins.push(
-    replace({
-      __DEV__: false
-    }),
+    // replace({
+    //   __DEV__: false
+    // }),
     uglify({
       compress: {
         pure_getters: true,

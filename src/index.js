@@ -1,5 +1,5 @@
-/* eslint-disable no-underscore-dangle */
 import invariant from 'invariant'
+import warning from 'warning'
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import * as sagaEffects from 'redux-saga/effects'
@@ -7,7 +7,7 @@ import { addPrefix, addSetPrefix } from './utils/prefix'
 import { thunkMiddleware } from './utils/thunk'
 import { mergeConfig } from './utils/mergeConfig'
 import helpers from './utils/sagaHelperWrappers'
-import { isNotNullObject, includeKey, isNotArrayObject, pureMerge } from './utils/common'
+import { isNotNullObject, includeKey, isNotArrayObject, pureMerge, isNode } from './utils/common'
 
 class Sirius {
   constructor (config) {
@@ -43,6 +43,7 @@ class Sirius {
     const config = this.config
     const reducers = {}
     let namespace = ''
+    // model defined in 'models'
     for (const name of Object.keys(config.models)) {
       const model = config.models[name]
       checkModel(model)
@@ -51,24 +52,29 @@ class Sirius {
       if (model.namespace) {
         namespace = model.namespace
       }
-      reducers[namespace] = createRootReducer(model, namespace)
-      getSagas.apply(this, [model, namespace])
       this._models.push({
         namespace,
         ...model
       })
     }
+    // model files
+    this._models.concat(getModelsFromPath(config.modelPath.path, config.modelPath.relative))
+    for (const m of this._models) {
+      const ns = m.namespace
+      reducers[ns] = createRootReducer(m, ns)
+      getSagas.apply(this, [m, ns])
+    }
     let store
     const sagaMiddleware = createSagaMiddleware()
-    const { middlewares } = this.config
+    const { middleware } = this.config
     let mws
-    if (!Array.isArray(middlewares)) {
+    if (!Array.isArray(middleware)) {
       mws = applyMiddleware(sagaMiddleware)
     } else {
       if (config.enableThunk) {
-        middlewares.push(thunkMiddleware)
+        middleware.push(thunkMiddleware)
       }
-      mws = applyMiddleware(...middlewares, sagaMiddleware)
+      mws = applyMiddleware(...middleware, sagaMiddleware)
     }
     this._reducers = reducers
     const combinedReducer = mergeReducers(reducers)
@@ -88,16 +94,41 @@ class Sirius {
 }
 
 function mergeReducers (reducers, newReducers) {
-  const finalyReduers = { ...reducers, ...newReducers }
-  if (!Object.keys(finalyReduers).length) {
+  const finalReducer = { ...reducers, ...newReducers }
+  if (!Object.keys(finalReducer).length) {
     return state => state
   }
-  return combineReducers(finalyReduers)
+  return combineReducers(finalReducer)
 }
 
 function checkModel (model) {
   invariant(Object.keys(model).includes('state'), 'model `state` field is required')
   return model
+}
+
+/**
+ * This function read model files from specific path in your project (usually 'src/model' or 'src/models')
+ * Param 'relative' decides whether to use full path as namespace or just use the file name
+ *
+ * Example :
+ * We have a model in 'models/earth/person.js' and set `path : './models'`
+ *
+ * `relative : true`  =>  namespace is 'person'
+ * `relative : false`  =>  namespace is 'earth/person'
+ *
+ * If 'namespace' is defined in the model, we use 'namespace'
+ *
+ * This only works in a node environment project
+ *
+ * @param {String} path  model files
+ * @param {Boolean} relative  'namespace' should be relative or not, default false
+ */
+function getModelsFromPath (path, relative) {
+  if (!isNode()) {
+    warning(true, `'modelPath' requires module 'fs' and 'path'`)
+    return []
+  }
+  return []
 }
 
 function getSagas (model, name) {

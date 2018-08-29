@@ -48,7 +48,7 @@ test('Model\'s namespace should be the key in config if not defined', () => {
   expect(s._models[0].namespace).toBe('test')
 })
 
-test('Should use model\'s \'namespace\' if defined', () => {
+test(`Should use model 'namespace' field if defined`, () => {
   const s = new Sirius({
     models: {
       test: {
@@ -61,7 +61,7 @@ test('Should use model\'s \'namespace\' if defined', () => {
   expect(s._models[0].namespace).toBe('person')
 })
 
-test('Model\'s `state` should be add into the store', () => {
+test(`Model 'state' should be add into the store`, () => {
   const s = new Sirius({
     models: {
       test: model0
@@ -366,7 +366,7 @@ test('Middlewares should be added', () => {
   expect(flag).toBe(1)
 })
 
-// this test must be executed after all the tests finish running
+// This test must be executed after all the tests finish running
 test('Model should be untouched', () => {
   expect(model0.state).toEqual(
     {

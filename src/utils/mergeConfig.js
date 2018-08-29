@@ -7,8 +7,8 @@ export const defaultConfig = {
     // use relative namespace or not
     relative: false
   },
-  // extra middlewares
-  middlewares: [],
+  // extra middleware
+  middleware: [],
   // enable thunk middleware
   enableThunk: true,
   // redux devtools
@@ -25,7 +25,7 @@ export function mergeConfig (config) {
   if (!config) return defaultConfig
   return {
     models: mergeObject(defaultConfig.models, config.models),
-    middlewares: config.middlewares || [],
+    middleware: config.middleware || [],
     modelPath: mergeObject(defaultConfig.modelPath, config.modelPath),
     // devtools: config.devtools ? config.devtools : defaultConfig.devtools
     devtools: mergeObject(defaultConfig.devtools, config.devtools),

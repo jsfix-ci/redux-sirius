@@ -2,7 +2,7 @@
   "name": "redux-sirius",
   "version": "0.1.10",
   "description": "A framework to integrate redux and redux-saga together",
-  "lisense": "MIT",
+  "license": "MIT",
   "repository": "github:Fullstop000/redux-sirius",
   "main": "dist/sirius.js",
   "scripts": {
@@ -34,7 +34,6 @@
     "framework"
   ],
   "author": "fullstop000",
-  "license": "MIT",
   "dependencies": {
     "redux": "^4.0.0",
     "redux-saga": "^0.16.0"
