@@ -32,13 +32,14 @@ test('Should only exist one redux store', () => {
     expect(e.message).toBe('Only support one store')
   }
 })
-test('Sirius with empty models', () => {
+
+test('Sirius instance with empty models', () => {
   const s = new Sirius()
   s.store()
   expect(s._models.length).toBe(0)
 })
 
-test('Model\'s namespace should be the key in config if not defined', () => {
+test(`Model 'namespace' should be the key in config if not defined`, () => {
   const s = new Sirius({
     models: {
       test: model0
@@ -61,7 +62,7 @@ test(`Should use model 'namespace' field if defined`, () => {
   expect(s._models[0].namespace).toBe('person')
 })
 
-test(`Model 'state' should be add into the store`, () => {
+test(`Model 'state' should be added into the store`, () => {
   const s = new Sirius({
     models: {
       test: model0
@@ -280,7 +281,7 @@ test('Model \'effects\' should be added as sagas', async () => {
   expect(state.test.lovers[2]).toEqual(lover3)
 })
 
-test('Dynamic add model', async () => {
+test(`'addModel' should apply model into the store`, async () => {
   const s = new Sirius({
     models: {
       switch: {
@@ -319,6 +320,49 @@ test('Dynamic add model', async () => {
   expect(state.switch).toBe(false)
 })
 
+test(`'addModel' should fail if model has no namespace`, () => {
+  const s = new Sirius()
+  try {
+    s.addModel({
+      state: 'test model'
+    })
+  } catch (error) {
+    expect(error.message).toBe(`model 'namespace' is required`)
+  }
+})
+
+test(`'addModel' should fail if model namespace is empty`, () => {
+  const s = new Sirius()
+  try {
+    s.addModel({
+      namespace: '',
+      state: 'test model'
+    })
+  } catch (error) {
+    expect(error.message).toBe(`model 'namespace' is required`)
+  }
+})
+
+test(`'addModel' should not add a model without state`, () => {
+  const s = new Sirius({
+    models: {
+      test: {
+        state: 'test'
+      }
+    }
+  })
+  const store = s.store()
+  expect(store.getState()).toEqual({
+    test: 'test'
+  })
+  s.addModel({
+    namespace: 'test2'
+  })
+  expect(store.getState()).toEqual({
+    test: 'test'
+  })
+})
+
 test('Default enable thunk middleware', async () => {
   const s = new Sirius({
     models: {
@@ -351,16 +395,16 @@ test('Disable the thunk middleware', async () => {
   }
 })
 
-test('Middlewares should be added', () => {
+test('Middleware should be added', () => {
   let flag = 0
-  const customeMiddleware = ({dispatch, getState}) => next => action => {
+  const myMiddleware = ({dispatch, getState}) => next => action => {
     if (action.type === 'test/middleware') {
       flag += 1
     }
     return next(action)
   }
   const store = new Sirius({
-    middlewares: [customeMiddleware]
+    middleware: [myMiddleware]
   }).store()
   store.dispatch({type: 'test/middleware'})
   expect(flag).toBe(1)

@@ -23,8 +23,11 @@ class Sirius {
    * @param {*} model
    */
   addModel (model) {
-    invariant(typeof model.namespace === 'string', 'model `namespace` field is required')
-    checkModel(model)
+    invariant(checkNS(model), `model 'namespace' is required`)
+    if (!checkModel(model)) {
+      warning(false, `model [${model.namespace}] has no state`)
+      return
+    }
     this._store.replaceReducer(
       mergeReducers(this._reducers, {
         [model.namespace]: createRootReducer(model, model.namespace)
@@ -46,11 +49,14 @@ class Sirius {
     // model defined in 'models'
     for (const name of Object.keys(config.models)) {
       const model = config.models[name]
-      checkModel(model)
       // if 'namespace' is defined by user, ignore the key of model in 'models'
       namespace = name
-      if (model.namespace) {
+      if (checkNS(model)) {
         namespace = model.namespace
+      }
+      if (!checkModel(model)) {
+        warning(false, `model [${namespace}] has no state`)
+        continue
       }
       this._models.push({
         namespace,
@@ -101,9 +107,13 @@ function mergeReducers (reducers, newReducers) {
   return combineReducers(finalReducer)
 }
 
+/**
+ * Check the model
+ *
+ * @param {Object} model
+ */
 function checkModel (model) {
-  invariant(Object.keys(model).includes('state'), 'model `state` field is required')
-  return model
+  return Object.keys(model).includes('state')
 }
 
 /**
@@ -125,7 +135,7 @@ function checkModel (model) {
  */
 function getModelsFromPath (path, relative) {
   if (!isNode()) {
-    warning(true, `'modelPath' requires module 'fs' and 'path'`)
+    warning(false, `'modelPath' requires node 'fs' and 'path'`)
     return []
   }
   return []
@@ -138,7 +148,7 @@ function getSagas (model, name) {
     return []
   }
   // Normally we define sagas with String patterns in helpers like `takeLatest`.
-  // But there are senarioes when we need native sagas with complex patterns.
+  // But there are scenarios when we need native sagas with complex patterns.
   // See https://redux-saga.js.org/docs/api/#takeeverypattern-saga-args about partterns
   if (typeof _effects === 'function') {
     const effects = _effects(helpers)
@@ -247,5 +257,8 @@ function createRootReducer (model, name) {
   return (state = model.state, action) => (handlers[action.type] ? handlers[action.type](state, action) : state)
 }
 
+function checkNS (model) {
+  return typeof model.namespace === 'string' && model.namespace
+}
 export const effects = sagaEffects
 export default Sirius
