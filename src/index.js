@@ -149,7 +149,7 @@ function getSagas (model, name) {
   }
   // Normally we define sagas with String patterns in helpers like `takeLatest`.
   // But there are scenarios when we need native sagas with complex patterns.
-  // See https://redux-saga.js.org/docs/api/#takeeverypattern-saga-args about partterns
+  // See https://redux-saga.js.org/docs/api/#takeeverypattern-saga-args about patterns
   if (typeof _effects === 'function') {
     const effects = _effects(helpers)
     for (const key of Object.keys(effects) || []) {
@@ -204,7 +204,7 @@ function getSagas (model, name) {
  * for state loading : form/setLoading
  * for state password : form/setPassword
  *
- * And a reducer receiving action whose type is '<namespace>/merge' (in the senario above is 'form/merge')
+ * And a reducer receiving action whose type is '<namespace>/merge' (in the scenario above is 'form/merge')
  * will be generated.
  * If state is an Object (not Array, not null), action payload must be a 'sub-object' of the state
  * which means all the fields of payload can be also found in the state. the 'merge' reducer will
@@ -212,8 +212,9 @@ function getSagas (model, name) {
  *
  * If the state is not an Object, reducer replace the state with payload directly.
  *
- * @param {*} model
- * @param {*} name
+ * @param {Object} model  model
+ * @param {String} name  model namespace
+ * @returns {Function}  combined reducer for the model
  */
 function createRootReducer (model, name) {
   const handlers = {}
@@ -251,7 +252,7 @@ function createRootReducer (model, name) {
     } else {
       finalReducer = (state) => state
     }
-    // notice the reducer override ocurrs here
+    // notice the reducer override occurs here
     handlers[addPrefix(name)(r)] = finalReducer
   }
   return (state = model.state, action) => (handlers[action.type] ? handlers[action.type](state, action) : state)
