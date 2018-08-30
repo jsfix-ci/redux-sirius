@@ -1,3 +1,3 @@
 export default {
-  state : 'city'
+  state: 'city'
 }
