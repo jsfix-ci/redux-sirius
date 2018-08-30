@@ -1,11 +1,13 @@
 export const defaultConfig = {
   // models
   models: {},
-  modelPath: {
+  fileModels: {
     // path to read model files
     path: '',
     // use relative namespace or not
-    relative: false
+    relative: false,
+    // webpack require.context
+    webpackContext: null
   },
   // extra middleware
   middleware: [],
@@ -26,7 +28,7 @@ export function mergeConfig (config) {
   return {
     models: mergeObject(defaultConfig.models, config.models),
     middleware: config.middleware || [],
-    modelPath: mergeObject(defaultConfig.modelPath, config.modelPath),
+    fileModels: mergeObject(defaultConfig.fileModels, config.fileModels),
     // devtools: config.devtools ? config.devtools : defaultConfig.devtools
     devtools: mergeObject(defaultConfig.devtools, config.devtools),
     enableThunk: config.enableThunk !== false

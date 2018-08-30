@@ -5,15 +5,16 @@ test('Fall back to default config', () => {
   expect(config).toEqual(defaultConfig)
 })
 
-test('Set \'modelPath\'', () => {
+test('Set \'fileModels\'', () => {
   const config = mergeConfig({
-    modelPath: {
+    fileModels: {
       path: './model',
       relative: true
     }
   })
-  expect(config.modelPath).toEqual({
+  expect(config.fileModels).toEqual({
     path: './model',
-    relative: true
+    relative: true,
+    webpackContext: null
   })
 })

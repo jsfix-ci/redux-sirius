@@ -283,7 +283,7 @@ test('Model \'effects\' should be added as sagas', async () => {
 
 test(`Shouldn't read models if 'config.path' is empty`, () => {
   const s = new Sirius({
-    modelPath: {
+    fileModels: {
       path: ''
     }
   })
@@ -294,7 +294,7 @@ test(`Shouldn't read models if 'config.path' is empty`, () => {
 
 test(`Should read models in 'config.path' and add them to the store`, () => {
   const s = new Sirius({
-    modelPath: {
+    fileModels: {
       path: '../testdata/model'
     }
   })

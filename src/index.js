@@ -66,7 +66,7 @@ class Sirius {
     }
     // read model files
     this._models = this._models.concat(
-      readModelsFromPath(config.modelPath.path, config.modelPath.relative))
+      readModelsFromPath(config.fileModels.path, config.fileModels.relative, config.fileModels.webpackContext))
     // process all models
     for (const m of this._models) {
       const ns = m.namespace
@@ -76,6 +76,7 @@ class Sirius {
     let store
     const sagaMiddleware = createSagaMiddleware()
     const { middleware } = this.config
+    // handle middleware
     let mws
     if (!Array.isArray(middleware)) {
       mws = applyMiddleware(sagaMiddleware)
@@ -85,7 +86,7 @@ class Sirius {
       }
       mws = applyMiddleware(...middleware, sagaMiddleware)
     }
-    this._reducers = reducers
+    // create the redux store
     const combinedReducer = mergeReducers(reducers)
     if (this.config.devtools.enable) {
       store = createStore(combinedReducer,
@@ -95,6 +96,7 @@ class Sirius {
     } else {
       store = createStore(combinedReducer, mws)
     }
+    this._reducers = reducers
     this._sagas.forEach(sagaMiddleware.run)
     this._store = store
     this.runSaga = sagaMiddleware.run
@@ -131,21 +133,34 @@ function checkModel (model) {
  *
  * If 'namespace' is defined in the model, we use 'namespace'
  *
- * This only works in a Nodejs based project
+ * And the native implement of this feature only works in Node environment.
+ * If you want to use this in the browser, use the webpackContext
  *
  * @param {String} dir  model files path
  * @param {Boolean} relative  'namespace' should be relative or not, default false
+ * @param {Array} webpackContext webpack `require.context` result. See https://webpack.js.org/guides/dependency-management/#context-module-api
  */
-function readModelsFromPath (dir, relative) {
+function readModelsFromPath (dir, relative, webpackContext) {
   if (!isNode()) {
-    warning(false, `'modelPath' requires Nodejs 'fs' and 'path'`)
-    return []
-  }
+    if (!webpackContext) {
+      return []
+    }
+    if (webpackContext.keys && webpackContext.resolve) {
+      return webpackContext.keys().map(m => {
+        let model = webpackContext(m)
+        if (model.__esModule) {
+          model = model.default
+        }
+        return checkNS(model) ? model : {namespace: getNamespace(m, relative), ...model}
+      })
+    } else {
+      warning(false, `'fileModels.webpackContext' is invalid.\n See https://webpack.js.org/guides/dependency-management/#context-module-api .`)
+      return []
+    }
+  } else {
   // do nothing with empty path
-  if (!dir) {
-    return []
+    return dir ? readModels(dir, relative) : []
   }
-  return readModels(dir, relative)
 }
 
 function getSagas (model, name) {
@@ -276,18 +291,20 @@ function checkNS (model) {
  * @param {Boolean} relative  use relative namespace or not
  */
 function getNamespace (path, relative) {
-  let final = path
   // ignore parent path
+  let final = ''
   if (relative) {
     const s = path.split('/')
     final = s[s.length - 1]
+  } else {
+    final = path.startsWith('./') ? path.slice(2) : path
   }
   // remove '.js'
   return final.slice(0, final.length - 3)
 }
 
 /**
- * Read all models recursively in a path
+ * Read all models recursively in a path. This just works in Node project
  *
  * @param {String} dir
  * @param {String} root
@@ -296,8 +313,8 @@ function getNamespace (path, relative) {
 function readModels (dir, relative) {
   const fs = require('fs')
   const path = require('path')
-  // only '*.js' file will use as model
-  const regex = /^([\w]+\/)*([\w]+\.js)$/
+  // eslint-disable-next-line no-eval
+  const evalRequire = eval('require')
   const list = []
   function readRecursively (dir, root, list) {
     fs.readdirSync(dir).forEach(file => {
@@ -306,8 +323,12 @@ function readModels (dir, relative) {
         // walk through
         readRecursively(filePath, root, list)
       } else {
-        if (file.match(regex)) {
-          let model = require(filePath)
+        // only '*.js' file will be added as model
+        if (file.match(/^(\.\/)?([\w]+\/)*([\w]+\.js)$/)) {
+          // bundler like webpack will complain about using dynamic require
+          // See https://github.com/webpack/webpack/issues/196
+          // use `eval` trick to avoid this
+          let model = evalRequire(filePath)
           // handling es6 module
           if (model.__esModule) {
             model = model.default

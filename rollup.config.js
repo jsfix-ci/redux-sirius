@@ -13,7 +13,7 @@ if (env === 'es' || env === 'cjs') {
   config.output = { format: env, indent: false }
 }
 if (env === 'development' || env === 'production') {
-  config.output = { format: 'umd', name: 'Sirius', indent: false }
+  config.output = { format: 'umd', name: 'Sirius', indent: false, exports: 'named' }
   config.plugins.push(
     commonJs(),
     // https://github.com/rollup/rollup-plugin-babel#configuring-babel
