@@ -1,6 +1,6 @@
 {
   "name": "redux-sirius",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "A framework to integrate redux and redux-saga together",
   "license": "MIT",
   "repository": "github:Fullstop000/redux-sirius",
