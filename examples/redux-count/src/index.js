@@ -7,7 +7,6 @@ import './index.css';
 import App from './Count';
 
 const delay = duration => new Promise(resolve => setTimeout(resolve, duration))
-
 const store = new Sirius({
   models: {
     count: {
@@ -25,6 +24,10 @@ const store = new Sirius({
         })
       })
     }
+  },
+  fileModels: {
+    relative: false,
+    webpackContext: require.context('./models', true, /\.js$/)
   }
 }).store()
 ReactDOM.render(
