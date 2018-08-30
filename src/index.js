@@ -28,6 +28,7 @@ class Sirius {
       warning(false, `model [${model.namespace}] has no state`)
       return
     }
+    invariant(this._store, `Sirius hasn't created redux store yet. Forget to '.store()' ?`)
     this._store.replaceReducer(
       mergeReducers(this._reducers, {
         [model.namespace]: createRootReducer(model, model.namespace)
@@ -63,8 +64,10 @@ class Sirius {
         ...model
       })
     }
-    // model files
-    this._models.concat(getModelsFromPath(config.modelPath.path, config.modelPath.relative))
+    // read model files
+    this._models = this._models.concat(
+      readModelsFromPath(config.modelPath.path, config.modelPath.relative))
+    // process all models
     for (const m of this._models) {
       const ns = m.namespace
       reducers[ns] = createRootReducer(m, ns)
@@ -128,17 +131,21 @@ function checkModel (model) {
  *
  * If 'namespace' is defined in the model, we use 'namespace'
  *
- * This only works in a node environment project
+ * This only works in a Nodejs based project
  *
- * @param {String} path  model files
+ * @param {String} dir  model files path
  * @param {Boolean} relative  'namespace' should be relative or not, default false
  */
-function getModelsFromPath (path, relative) {
+function readModelsFromPath (dir, relative) {
   if (!isNode()) {
-    warning(false, `'modelPath' requires node 'fs' and 'path'`)
+    warning(false, `'modelPath' requires Nodejs 'fs' and 'path'`)
     return []
   }
-  return []
+  // do nothing with empty path
+  if (!dir) {
+    return []
+  }
+  return readModels(dir, relative)
 }
 
 function getSagas (model, name) {
@@ -255,11 +262,67 @@ function createRootReducer (model, name) {
     // notice the reducer override occurs here
     handlers[addPrefix(name)(r)] = finalReducer
   }
-  return (state = model.state, action) => (handlers[action.type] ? handlers[action.type](state, action) : state)
+  return (state = initialState, action) => (handlers[action.type] ? handlers[action.type](state, action) : state)
 }
 
 function checkNS (model) {
   return typeof model.namespace === 'string' && model.namespace
 }
+
+/**
+ * Get namespace from file path
+ *
+ * @param {String} path  model file path such as 'test/sub/model.js'
+ * @param {Boolean} relative  use relative namespace or not
+ */
+function getNamespace (path, relative) {
+  let final = path
+  // ignore parent path
+  if (relative) {
+    const s = path.split('/')
+    final = s[s.length - 1]
+  }
+  // remove '.js'
+  return final.slice(0, final.length - 3)
+}
+
+/**
+ * Read all models recursively in a path
+ *
+ * @param {String} dir
+ * @param {String} root
+ * @param {Array} list
+ */
+function readModels (dir, relative) {
+  const fs = require('fs')
+  const path = require('path')
+  // only '*.js' file will use as model
+  const regex = /^([\w]+\/)*([\w]+\.js)$/
+  const list = []
+  function readRecursively (dir, root, list) {
+    fs.readdirSync(dir).forEach(file => {
+      const filePath = path.join(dir, file)
+      if (fs.statSync(filePath).isDirectory()) {
+        // walk through
+        readRecursively(filePath, root, list)
+      } else {
+        if (file.match(regex)) {
+          let model = require(filePath)
+          // handling es6 module
+          if (model.__esModule) {
+            model = model.default
+          }
+          // get relative path of the root path
+          const pathNS = path.join(path.relative(root, dir), file)
+          list.push(checkNS(model) ? model : {namespace: getNamespace(pathNS, relative), ...model})
+        }
+      }
+    })
+  }
+  const p = path.resolve(__dirname, dir)
+  readRecursively(p, p, list)
+  return list
+}
+
 export const effects = sagaEffects
 export default Sirius

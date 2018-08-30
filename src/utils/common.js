@@ -47,5 +47,5 @@ export const pureMerge = (obj, ...payloads) => payloads.reduce((res, payload) =>
   }
 }, obj)
 
-// Detect the js env is node or not
+// Detect the js env is Node or not
 export const isNode = () => typeof process !== 'undefined' && process.versions != null && process.versions.node != null

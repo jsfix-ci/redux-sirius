@@ -281,6 +281,37 @@ test('Model \'effects\' should be added as sagas', async () => {
   expect(state.test.lovers[2]).toEqual(lover3)
 })
 
+test(`Shouldn't read models if 'config.path' is empty`, () => {
+  const s = new Sirius({
+    modelPath: {
+      path: ''
+    }
+  })
+  const store = s.store()
+  expect(store.getState()).toBeUndefined()
+  expect(s._models).toEqual([])
+})
+
+test(`Should read models in 'config.path' and add them to the store`, () => {
+  const s = new Sirius({
+    modelPath: {
+      path: '../testdata/model'
+    }
+  })
+  const store = s.store()
+  expect(store.getState()).toEqual(
+    { model3: 'model3',
+      '@@@@@@@test': 'model1',
+      'test1/sub/model0': 'model0',
+      'test2/model2': 'model2' }
+  )
+  store.dispatch({
+    type: 'model3/merge',
+    payload: 'model3 changed'
+  })
+  expect(store.getState().model3).toBe('model3 changed')
+})
+
 test(`'addModel' should apply model into the store`, async () => {
   const s = new Sirius({
     models: {
