@@ -51,6 +51,11 @@
   "jest": {
     "moduleFileExtensions": [
       "js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "testdata",
+      "examples"
     ]
   },
   "npmFileMap": [
