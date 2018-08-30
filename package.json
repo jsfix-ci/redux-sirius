@@ -44,9 +44,11 @@
     }
   },
   "lint-staged": {
-    "*.js": [
-      "eslint --fix"
-    ]
+    "linters": {
+      "src/**/*.js": [
+        "eslint --fix"
+      ]
+    }
   },
   "jest": {
     "moduleFileExtensions": [
