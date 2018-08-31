@@ -1,4 +1,4 @@
-export const thunkMiddleware = ({dispatch, getState}) => next => action => {
+export const thunkMiddleware = ({dispatch, getState}) => next => async action => {
   if (typeof action === 'function') {
     return action(dispatch, getState)
   }

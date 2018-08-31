@@ -409,6 +409,7 @@ test('Default enable thunk middleware', async () => {
     await delay(1000)
     test = true
   })
+  expect(test).toBe(false)
   await delay(1000)
   expect(test).toBe(true)
 })
