@@ -1,10 +1,11 @@
 # redux-sirius
 
-[![npm version](https://badge.fury.io/js/redux-sirius.svg)](https://badge.fury.io/js/redux-sirius)
+[![npm version](https://img.shields.io/npm/v/redux-sirius.svg?colorB=green)](https://www.npmjs.com/package/redux-sirius)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 A simple framework to manage redux store
 
-## Contents
+## Content
 * [Installation](#installation)
 * [Usage](#usage)
 * [Model](#model)
