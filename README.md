@@ -1,12 +1,21 @@
 # redux-sirius
 
-A simple framework to manage redux store
-
 [![npm version](https://badge.fury.io/js/redux-sirius.svg)](https://badge.fury.io/js/redux-sirius)
 
-## Getting Started
+A simple framework to manage redux store
 
-### Install
+## Contents
+* [Installation](##Installation)
+* [Usage](##Usage)
+* [Model](##Model)
+* [Conventional Reducers](##Conventional-Reducers)
+   - [Set-Prefixed Reducers](###Set-Prefixed-Reducers)
+   - [Merge Reducer](###Merge-Reducer)
+* [Saga Support](##Saga-Support)
+* [Config Options](##Config-Options)
+* [API Reference](##API Reference)
+
+## Installation
 ```shell
 npm i redux-sirius
 ```
@@ -17,7 +26,7 @@ or use [Yarn](https://yarnpkg.com/)
 yarn add redux-sirius
 ```
 
-### Usage
+## Usage
 
 **index.js**
 
@@ -83,13 +92,13 @@ store.dispatch({
 })
 
 ```
-### Saga Support
+## Model
 
-> TODO
+> todo
 
-### Conventional Reducers
+## Conventional Reducers
 
-The conventional reducers are generated automatically by 'redux-sirius' to fit requirements in most redux developing senarioes such as updating a single field of the state.
+The conventional reducers are generated automatically by 'redux-sirius' to fit requirements in most redux developing scenarios such as updating a single field of the state.
 
 For now there are two types of conventional reducers:
 
@@ -122,9 +131,16 @@ const store = new Sirius({
 
 Then let's dispatch actions
 
-#### 'Set-Prefixed' Action : `<namespace>/set<uppercase the first letter of field name>`
+### Set-Prefixed Reducers
+
+action type:
+```
+<namespace>/set<uppercase the first letter of field name>
+```
 
 `redux-sirius` will generate a reducer for each field in the model's `state` (**so this only occurs when the state is an Object but not an Array**) and action type follows the rule : `<namespace>/set<uppercase the first letter of field name>`.
+
+Example:
 
 ```js
 store.dispatch({
@@ -134,15 +150,34 @@ store.dispatch({
 
 // Then state.person.name will be 'Tim'
 ```
+Then `state.person.name` will be 'Tim'
+```diff
+{
+  person: {
+-   name: 'Mike',
++   name: 'Time',
+    sex: 0,
+    weight: 100,
+    height: 180,
+  }
+}
+```
 
-#### Merge Action : `<namespace>/merge`
+### Merge Reducer
+
+action type:
+```
+<namespace>/merge
+```
 
 If you want to update multiple state fields, this reducer will be very helpful.
 
 But you need to pay extra attention when using this:
-- Although `merge` reducer is powerful and convenient, **it's highly recommended to use `set-prefixed` reducer to update a single state field** because `merge` is not as specific as 'setXXX' when dispatching the action and `merge` reducer does extra checking to ensure not bringing new field into the state to avoid making codes more confused.
+- Although `merge` reducer is powerful and convenient, **it's highly recommended to use `set-prefixed` reducer to update a single state field** because `merge` is not as specific as `setXXX` when dispatching the action and `merge` reducer does extra checking to ensure not bringing new field into the state to avoid making codes more confused.
 - Only the fields that state includes will be merged in the payload. But a empty object field (like `{ state: {} }`) will be directly replaced by payload.
 - If state is not an Object or 'un-spreadable' (primitive type state like `{ state:0 }`), this reducer will replace it with payload directly.
+
+Example :
 
 ```js
 store.dispatch({
@@ -153,19 +188,50 @@ store.dispatch({
     from: 'Mars'
   }
 })
-// 'name' and 'height' works and 'from' is ignored
+//
 ```
-
-### Config Options
+`name` and `height` changed but `from` is ignored
+```diff
+{
+  person: {
+-   name: 'Mike',
++   name: 'Time',
+    sex: 0,
+    weight: 100,
+-   height: 180,
++   height: 170,
+  }
+}
+```
+## Saga Support
 
 > TODO
+
+## Config Options
+
+> TODO
+
+## API Reference
+### Init a redux-sirius instance
+
+* `new Sirius(config)`
+
+### sirius instance
+
+* `store()`
+* `addModel(model)`
+
+### Store
+
+* `getState()`
+* `dispatch(action)`
 
 ## TODO
 
 - [ ] Redux reducer enhancer support
 - [x] Complete support for all redux-saga helpers
-- [ ] Model lifecycle hooks
+- [ ] Model life cycle hooks
 - [ ] Typescript interface definitions
 
-## LISENCE
+## LICENCE
 [MIT](https://tldrlegal.com/license/mit-license)
