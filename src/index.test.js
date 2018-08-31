@@ -351,6 +351,15 @@ test(`'addModel' should apply model into the store`, async () => {
   expect(state.switch).toBe(false)
 })
 
+test(`'addModel' should fail if store hasn't been created`, () => {
+  const s = new Sirius()
+  try {
+    s.addModel({namespace: 'test', ...model0})
+  } catch (error) {
+    expect(error.message).toBe(`Sirius hasn't created redux store yet. Forget to '.store()' ?`)
+  }
+})
+
 test(`'addModel' should fail if model has no namespace`, () => {
   const s = new Sirius()
   try {

@@ -23,12 +23,12 @@ class Sirius {
    * @param {*} model
    */
   addModel (model) {
+    invariant(this._store, `Sirius hasn't created redux store yet. Forget to '.store()' ?`)
     invariant(checkNS(model), `model 'namespace' is required`)
     if (!checkModel(model)) {
       warning(false, `model [${model.namespace}] has no state`)
       return
     }
-    invariant(this._store, `Sirius hasn't created redux store yet. Forget to '.store()' ?`)
     this._store.replaceReducer(
       mergeReducers(this._reducers, {
         [model.namespace]: createRootReducer(model, model.namespace)
