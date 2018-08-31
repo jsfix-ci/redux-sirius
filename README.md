@@ -139,7 +139,7 @@ action type:
 <namespace>/set<uppercase the first letter of field name>
 ```
 
-`redux-sirius` will generate a reducer for each field in the model's `state` (**so this only occurs when the state is an Object but not an Array**) and action type follows the rule : `<namespace>/set<uppercase the first letter of field name>`.
+`redux-sirius` will generate a reducer for each field in the model's `state` (**this only occurs when the state is an Object but not an Array**) and action type follows the rule : `<namespace>/set<uppercase the first letter of field name>`.
 
 Example:
 
@@ -156,7 +156,7 @@ Then `state.person.name` will be 'Tim'
 {
   person: {
 -   name: 'Mike',
-+   name: 'Time',
++   name: 'Tim',
     sex: 0,
     weight: 100,
     height: 180,
@@ -175,8 +175,10 @@ If you want to update multiple state fields, this reducer will be very helpful.
 
 But you need to pay extra attention when using this:
 - Although `merge` reducer is powerful and convenient, **it's highly recommended to use `set-prefixed` reducer to update a single state field** because `merge` is not as specific as `setXXX` when dispatching the action and `merge` reducer does extra checking to ensure not bringing new field into the state to avoid making codes more confused.
-- Only the fields that state includes will be merged in the payload. But a empty object field (like `{ state: {} }`) will be directly replaced by payload.
-- If state is not an Object or 'un-spreadable' (primitive type state like `{ state:0 }`), this reducer will replace it with payload directly.
+- `merge` follows the rules below:
+   - Only the fields that state includes will be merged in the payload. But if the original field value is `{}`, it'll be directly replaced by payload.
+   - If original field value is not a 'spreadable' Object or is an Array, this reducer will replace it with payload directly.
+- `merge` works fine with nested objects but do not abuse it when your state is very complicated and nested deeply because it's hard to trace the state changing flow.
 
 Example :
 
@@ -196,7 +198,7 @@ store.dispatch({
 {
   person: {
 -   name: 'Mike',
-+   name: 'Time',
++   name: 'Tim',
     sex: 0,
     weight: 100,
 -   height: 180,
