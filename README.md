@@ -5,15 +5,15 @@
 A simple framework to manage redux store
 
 ## Contents
-* [Installation](##Installation)
-* [Usage](##Usage)
-* [Model](##Model)
-* [Conventional Reducers](##Conventional-Reducers)
-   - [Set-Prefixed Reducers](###Set-Prefixed-Reducers)
-   - [Merge Reducer](###Merge-Reducer)
-* [Saga Support](##Saga-Support)
-* [Config Options](##Config-Options)
-* [API Reference](##API Reference)
+* [Installation](#installation)
+* [Usage](#usage)
+* [Model](#model)
+* [Conventional Reducers](#conventional-reducers)
+   - [Set-Prefixed Reducers](#set-prefixed-reducers)
+   - [Merge Reducer](#merge-reducer)
+* [Saga Support](#saga-support)
+* [Config Options](#config-options)
+* [API Reference](#api-reference)
 
 ## Installation
 ```shell
