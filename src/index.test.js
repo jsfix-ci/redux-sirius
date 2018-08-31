@@ -362,6 +362,7 @@ test(`'addModel' should fail if store hasn't been created`, () => {
 
 test(`'addModel' should fail if model has no namespace`, () => {
   const s = new Sirius()
+  s.store()
   try {
     s.addModel({
       state: 'test model'
@@ -373,6 +374,7 @@ test(`'addModel' should fail if model has no namespace`, () => {
 
 test(`'addModel' should fail if model namespace is empty`, () => {
   const s = new Sirius()
+  s.store()
   try {
     s.addModel({
       namespace: '',
