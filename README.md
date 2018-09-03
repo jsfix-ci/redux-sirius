@@ -78,7 +78,7 @@ export default {
 ```js
 import store from './index.js'
 
-// 'count/setCount' is auto-generated
+// 'count/setCount' is auto-generated which called 'Conventional Reducer' specially
 store.dispatch({
   type: 'count/setCount',
   payload: 10
@@ -95,7 +95,64 @@ store.dispatch({
 ```
 ## Model
 
-> todo
+A `model` may have properties below :
+
+#### `namespace`
+**Optional**
+
+Value : A `String` except `''`
+
+Generally, the `namespace` is a string to indicate the model's name.
+
+The `namespace` is used as a part of action type naming rule:
+- If you want to trigger a reducer of this model, you should add `<namespace>/` before the `key` (For special `Conventional Reducers` section for more details ).
+- If you want to get the state of this model, you should use `state.<namespace>.<something>`
+
+If model's `namespace` is defined, the `key` of a model in `config` will be ignored.
+
+If you want to use `addModel()` to including your model dynamically to the redux store, `namespace` has to be defined.
+
+#### `state`
+**Required**
+
+Value : Any
+
+The initial redux state of this model.
+
+#### `reducers`
+**Optional**
+
+Value : An `Object` except `Array`
+
+An object whose key is the action type and value is redux reducer pure function.
+
+Example :
+```js
+// count.js namespace is count
+{
+  state: 0,
+  reducers: {
+    increment: state => state + 1,
+    decrement: state => state - 1
+  }
+}
+// dispatch
+store.dispatch('count/increment')
+```
+#### `effects`
+**Optional**
+
+Value :
+ - A `Function` for only using 3 default redux-saga helpers
+ - An `Array` that contains native redux-saga tasks
+ - An `Object` with key `default` and `native` like:
+    ```js
+    {
+       default: <function for helpers>
+       native: <Array for native tasks>
+    }
+    ```
+
 
 ## Conventional Reducers
 
@@ -229,12 +286,12 @@ store.dispatch({
 * `getState()`
 * `dispatch(action)`
 
-## TODO
+<!-- ## TODO
 
 - [ ] Redux reducer enhancer support
 - [x] Complete support for all redux-saga helpers
 - [ ] Model life cycle hooks
-- [ ] Typescript interface definitions
+- [ ] Typescript interface definitions -->
 
 ## LICENCE
 [MIT](https://tldrlegal.com/license/mit-license)
