@@ -17,11 +17,13 @@ export const includeNewKeys = (obj, ...payloads) => {
 // 'obj' and 'payloads' should be an Object but not an array
 // ignore the prototype of 'obj'
 export const pureMerge = (obj, ...payloads) => payloads.reduce((res, payload) => {
+  if (!isNotNullObject(res)) { return res }
   const originKeys = Object.keys(res)
   // empty origin object, use payload as next
   if (originKeys.length === 0) {
     return payload
   } else {
+    if (!isNotNullObject(payload)) { return res }
     const payloadKeys = Object.keys(payload)
     // do merge
     return payloadKeys.reduce((_res, key) => {
